@@ -13,14 +13,22 @@ A standalone GUI tool for generating customizable Python project skeletons from 
 
 ## Installation
 
-### Method 1: Direct Installation (Recommended)
+### Method 1: Run as Module (Recommended)
+
+```bash
+pip install wxpython
+cd "/path/to/Python Project Generator"
+python -m "Python Project Generator"
+```
+
+### Method 2: Direct Script Execution
 
 ```bash
 pip install wxpython
 python generator_gui.py
 ```
 
-### Method 2: Install as Package
+### Method 3: Install as Package
 
 ```bash
 pip install -e .
@@ -33,12 +41,19 @@ python-project-generator-gui
 
 Launch the GUI application:
 
+**As a module (recommended):**
+```bash
+python -m "Python Project Generator"
+# or explicitly
+python -m "Python Project Generator" --gui
+```
+
+**Direct script execution:**
 ```bash
 python generator_gui.py
 ```
 
-Or if installed as a package:
-
+**If installed as a package:**
 ```bash
 python-project-generator-gui
 ```
@@ -47,8 +62,14 @@ python-project-generator-gui
 
 Use the command-line interface:
 
+**As a module (recommended):**
 ```bash
-python project_generator.py
+python -m "Python Project Generator" --cli [options] project_name
+```
+
+**Direct script execution:**
+```bash
+python project_generator.py [options] project_name
 ```
 
 ## How It Works
@@ -57,6 +78,36 @@ python project_generator.py
 2. **Configure Project**: Fill in project details (name, author, description, etc.)
 3. **Select Features**: Choose which features to include
 4. **Generate**: Click generate to create your project
+
+## Module Execution
+
+The Python Project Generator can be executed as a Python module, providing a convenient way to launch either the GUI or CLI interface:
+
+### GUI Mode (Default)
+```bash
+# Launch GUI (default behavior)
+python -m "Python Project Generator"
+
+# Explicitly launch GUI
+python -m "Python Project Generator" --gui
+```
+
+### CLI Mode
+```bash
+# List available templates
+python -m "Python Project Generator" --cli dummy --list-templates
+
+# Generate a project
+python -m "Python Project Generator" --cli my_project --template flask-web-app --author "Your Name"
+
+# Get CLI help
+python -m "Python Project Generator" --cli --help
+```
+
+### Version Information
+```bash
+python -m "Python Project Generator" --version
+```
 
 ## Available Templates
 

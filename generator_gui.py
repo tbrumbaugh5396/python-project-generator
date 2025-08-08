@@ -18,7 +18,7 @@ except ImportError:
     scrolled = None
     WX_AVAILABLE = False
 
-from project_generator import ProjectGenerator, TemplateManager, setup_logging
+from .project_generator import ProjectGenerator, TemplateManager, setup_logging
 
 __version__ = "1.0.0"
 

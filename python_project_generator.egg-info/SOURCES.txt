@@ -13,6 +13,8 @@ scripts.py
 setup.py
 ./CHANGELOG.md
 ./README.md
+./__init__.py
+./__main__.py
 ./generator_gui.py
 ./project_generator.py
 ./requirements-dev.txt
