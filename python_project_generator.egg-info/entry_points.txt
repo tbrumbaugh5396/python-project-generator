@@ -1,0 +1,7 @@
+[console_scripts]
+pyproj-gen = project_generator:main
+python-project-generator = project_generator:main
+
+[gui_scripts]
+pyproj-gen-gui = generator_gui:main
+python-project-generator-gui = generator_gui:main

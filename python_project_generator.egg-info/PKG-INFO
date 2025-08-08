@@ -1,0 +1,398 @@
+Metadata-Version: 2.4
+Name: python-project-generator
+Version: 1.0.0
+Summary: A powerful GUI and CLI tool for generating customizable Python project templates
+Home-page: https://github.com/python-project-generator/python-project-generator
+Author: Python Project Generator Team
+Author-email: Python Project Generator Team <info@python-project-generator.com>
+Maintainer-email: Python Project Generator Team <info@python-project-generator.com>
+License: MIT
+Project-URL: Homepage, https://github.com/python-project-generator/python-project-generator
+Project-URL: Documentation, https://python-project-generator.readthedocs.io/
+Project-URL: Repository, https://github.com/python-project-generator/python-project-generator.git
+Project-URL: Bug Reports, https://github.com/python-project-generator/python-project-generator/issues
+Project-URL: Changelog, https://github.com/python-project-generator/python-project-generator/blob/main/CHANGELOG.md
+Keywords: python,project,generator,template,skeleton,cli,gui,development,tools
+Platform: any
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Code Generators
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Utilities
+Classifier: Environment :: X11 Applications :: Qt
+Classifier: Environment :: Win32 (MS Windows)
+Classifier: Environment :: MacOS X
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: wxpython>=4.2.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: flake8>=6.0.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Requires-Dist: pre-commit>=3.0.0; extra == "dev"
+Requires-Dist: tox>=4.0.0; extra == "dev"
+Provides-Extra: gui
+Requires-Dist: wxpython>=4.2.0; extra == "gui"
+Provides-Extra: all
+Requires-Dist: wxpython>=4.2.0; extra == "all"
+Requires-Dist: pytest>=7.0.0; extra == "all"
+Requires-Dist: pytest-cov>=4.0.0; extra == "all"
+Requires-Dist: black>=23.0.0; extra == "all"
+Requires-Dist: flake8>=6.0.0; extra == "all"
+Requires-Dist: mypy>=1.0.0; extra == "all"
+Requires-Dist: pre-commit>=3.0.0; extra == "all"
+Requires-Dist: tox>=4.0.0; extra == "all"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: platform
+Dynamic: requires-python
+
+# Python Project Generator
+
+A standalone GUI tool for generating customizable Python project skeletons from templates.
+
+## Features
+
+- 🎨 **Beautiful GUI Interface** - Intuitive wxPython-based interface
+- 📁 **Multiple Templates** - Support for different project templates
+- ⚙️ **Customizable Features** - Select exactly what you need
+- 🔄 **Template Management** - Download and manage templates from Git repositories
+- 📦 **Professional Structure** - Generate production-ready Python projects
+- 🚀 **Ready to Deploy** - Projects ready for PyPI and development
+
+## Installation
+
+### Method 1: Direct Installation (Recommended)
+
+```bash
+pip install wxpython
+python generator_gui.py
+```
+
+### Method 2: Install as Package
+
+```bash
+pip install -e .
+python-project-generator-gui
+```
+
+## Usage
+
+### GUI Application
+
+Launch the GUI application:
+
+```bash
+python generator_gui.py
+```
+
+Or if installed as a package:
+
+```bash
+python-project-generator-gui
+```
+
+### Command Line
+
+Use the command-line interface:
+
+```bash
+python project_generator.py
+```
+
+## How It Works
+
+1. **Choose Template**: Select from available project templates
+2. **Configure Project**: Fill in project details (name, author, description, etc.)
+3. **Select Features**: Choose which features to include
+4. **Generate**: Click generate to create your project
+
+## Available Templates
+
+### Python Skeleton Project
+- Complete Python project structure
+- CLI and GUI interfaces
+- Unit testing framework
+- PyPI packaging setup
+- Executable building scripts
+- Comprehensive documentation
+
+### Minimal Python Project
+- Basic Python project structure
+- Essential files only
+- Quick start for simple projects
+
+## Features You Can Select
+
+- ✅ **Command Line Interface (CLI)** - argparse-based CLI
+- ✅ **Graphical User Interface (GUI)** - wxPython GUI
+- ✅ **Unit Tests** - pytest framework and sample tests
+- ✅ **Executable Building** - PyInstaller scripts
+- ✅ **PyPI Packaging** - setup.py, pyproject.toml
+- ✅ **Development Requirements** - Testing and code quality tools
+- ✅ **License File** - Multiple license options
+- ✅ **README.md** - Comprehensive documentation
+- ✅ **Makefile** - Common development tasks
+- ✅ **`.gitignore`** - Python-specific ignore rules
+- ✅ **GitHub Actions** - CI/CD workflow
+
+## Template Sources
+
+The generator can work with:
+
+- **Git Repositories**: Clone templates from GitHub, GitLab, etc.
+- **Local Templates**: Use local template directories
+- **Built-in Templates**: Minimal templates included with the generator
+
+## Configuration
+
+Templates are managed in `~/.python-project-generator/templates/`.
+
+To add custom templates, modify the `default_templates` configuration in `project_generator.py`.
+
+## Generated Project Structure
+
+```
+your_project/
+├── src/
+│   └── your_project/
+│       ├── __init__.py
+│       ├── core.py
+│       ├── cli.py          # If CLI selected
+│       └── gui.py          # If GUI selected
+├── tests/                  # If tests selected
+│   ├── __init__.py
+│   └── test_core.py
+├── scripts/                # If executable selected
+│   └── build_executable.py
+├── .github/workflows/      # If GitHub Actions selected
+│   └── ci.yml
+├── setup.py               # If PyPI packaging selected
+├── pyproject.toml         # If PyPI packaging selected
+├── requirements.txt
+├── requirements-dev.txt   # If dev requirements selected
+├── Makefile              # If Makefile selected
+├── .gitignore            # If gitignore selected
+├── LICENSE               # If license selected
+└── README.md             # If README selected
+```
+
+## Requirements
+
+- Python 3.8+
+- wxPython 4.2+
+- Git (for template downloads)
+
+## Development
+
+### Running from Source
+
+```bash
+git clone <this-repository>
+cd python-project-generator
+pip install wxpython
+python generator_gui.py
+```
+
+### Installing in Development Mode
+
+```bash
+pip install -e .
+```
+
+## Packaging and Distribution
+
+The Python Project Generator is professionally packaged and ready for distribution.
+
+### Building from Source
+
+1. **Clone the repository**:
+```bash
+git clone https://github.com/python-project-generator/python-project-generator.git
+cd python-project-generator
+```
+
+2. **Install development dependencies**:
+```bash
+pip install -r requirements-dev.txt
+```
+
+3. **Run tests**:
+```bash
+python build.py test
+```
+
+4. **Build the package**:
+```bash
+python build.py build
+```
+
+### Development Workflow
+
+```bash
+# Format code
+python build.py format
+
+# Run linting
+python build.py lint
+
+# Run all checks and build
+python build.py all
+
+# Install in development mode
+python build.py install
+```
+
+### Package Structure
+
+```
+python-project-generator/
+├── project_generator.py      # Main generator logic
+├── generator_gui.py          # wxPython GUI interface
+├── run.py                   # Entry point script
+├── setup.py                 # Legacy packaging config
+├── pyproject.toml           # Modern packaging config
+├── MANIFEST.in              # Package file inclusion rules
+├── build.py                 # Build automation script
+├── requirements.txt         # Runtime dependencies
+├── requirements-dev.txt     # Development dependencies
+├── tests/                   # Test suite
+│   ├── __init__.py
+│   └── test_project_generator.py
+├── LICENSE                  # MIT license
+├── CHANGELOG.md            # Version history
+└── README.md               # This file
+```
+
+### Entry Points
+
+The package provides multiple entry points:
+
+- **GUI Application**: `python-project-generator-gui` or `pyproj-gen-gui`
+- **CLI Tool**: `python-project-generator` or `pyproj-gen`
+
+### Dependencies
+
+- **Runtime**: wxPython 4.2+
+- **Development**: pytest, black, flake8, mypy, build tools
+- **Python**: 3.8+ required
+
+## Examples
+
+### Creating a Full-Featured Project
+
+1. Launch the GUI: `python generator_gui.py`
+2. Select "Python Skeleton Project" template
+3. Fill in project details:
+   - Name: "my_awesome_project"
+   - Author: "Your Name"
+   - Email: "your@email.com"
+   - Description: "An awesome Python project"
+4. Select desired features (CLI, GUI, tests, etc.)
+5. Choose output directory
+6. Click "Generate Project"
+
+### Quick Minimal Project
+
+For a simple project with just the basics:
+
+1. Select "Minimal Python Project" template
+2. Fill in basic info
+3. Keep default features (tests, packaging, README)
+4. Generate
+
+## Customization
+
+### Adding Custom Templates
+
+1. Add template configuration to `project_generator.py`:
+
+```python
+"my-template": {
+    "name": "My Custom Template",
+    "description": "A custom project template",
+    "source": "https://github.com/myuser/my-template.git",
+    "type": "git",
+    "features": ["cli", "tests", "packaging"]
+}
+```
+
+2. Templates will be automatically downloaded when selected
+
+### Template Structure
+
+Templates should follow this structure:
+
+```
+template/
+├── src/
+│   └── {{package_name}}/
+│       ├── __init__.py
+│       └── core.py
+├── setup.py
+├── README.md
+└── requirements.txt
+```
+
+Use placeholder strings that will be replaced:
+- `{{package_name}}` - Package name
+- `{{project_name}}` - Project display name
+- `{{author}}` - Author name
+- `{{email}}` - Author email
+- etc.
+
+## Troubleshooting
+
+### wxPython Installation Issues
+
+**macOS:**
+```bash
+pip install -U wxpython
+```
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt-get install libgtk-3-dev libwebkitgtk-3.0-dev
+pip install wxpython
+```
+
+**Windows:**
+```bash
+pip install wxpython
+```
+
+### Template Download Issues
+
+- Ensure Git is installed and accessible
+- Check internet connection
+- Verify template repository URL
+
+## License
+
+MIT License - see LICENSE file for details.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## Support
+
+- Create an issue on GitHub for bugs or feature requests
+- Check the documentation for usage instructions
+- Review examples for common use cases 

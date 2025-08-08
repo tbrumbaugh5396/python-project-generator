@@ -1,0 +1,5 @@
+# Core dependencies for the skeleton project
+# Add your project's dependencies here
+
+# Optional GUI support
+wxpython>=4.2.0  # GUI support enabled for desktop applications 
