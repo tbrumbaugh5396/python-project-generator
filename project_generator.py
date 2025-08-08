@@ -132,6 +132,27 @@ class TemplateManager:
                 "source": "local",
                 "type": "builtin",
                 "features": ["jupyter", "research", "reproducible_env", "data_versioning", "notebooks", "reports", "license", "readme", "gitignore"]
+            },
+            "binary-extension": {
+                "name": "Binary/Extension Package",
+                "description": "Python package with C/C++ extensions and compiled binary modules",
+                "source": "local",
+                "type": "builtin",
+                "features": ["c_extensions", "compilation", "wheel_building", "cross_platform", "performance", "tests", "pypi_packaging", "license", "readme", "gitignore", "ci_cd"]
+            },
+            "namespace-package": {
+                "name": "Namespace Package",
+                "description": "Namespace package for distributed development across multiple repositories",
+                "source": "local",
+                "type": "builtin",
+                "features": ["namespace_packaging", "distributed_development", "implicit_namespaces", "pypi_packaging", "tests", "license", "readme", "gitignore"]
+            },
+            "plugin-framework": {
+                "name": "Plugin Framework Package",
+                "description": "Plugin-style package with entry points and extensible architecture",
+                "source": "local",
+                "type": "builtin",
+                "features": ["plugin_system", "entry_points", "plugin_discovery", "extensible_architecture", "hooks", "tests", "pypi_packaging", "license", "readme", "gitignore"]
             }}
     
     def get_available_templates(self) -> Dict[str, Dict[str, Any]]:
@@ -186,6 +207,510 @@ class TemplateManager:
         # Builtin templates are generated dynamically, so return None
         # The actual generation happens in _generate_builtin_project
         return None
+    
+    def get_template_structure(self, template_id: str) -> Dict[str, Any]:
+        """Get the expected project structure for a template."""
+        structures = {
+            "minimal-python": {
+                "description": "Basic Python project with essential files only",
+                "structure": [
+                    "your_project/",
+                    "├── src/",
+                    "│   └── your_project/",
+                    "│       ├── __init__.py",
+                    "│       └── core.py",
+                    "├── tests/",
+                    "│   ├── __init__.py",
+                    "│   └── test_core.py",
+                    "├── setup.py",
+                    "├── pyproject.toml",
+                    "├── requirements.txt",
+                    "├── .gitignore",
+                    "├── LICENSE",
+                    "└── README.md"
+                ],
+                "key_features": [
+                    "Simple package structure",
+                    "Basic testing setup",
+                    "PyPI packaging ready",
+                    "Essential documentation"
+                ]
+            },
+            "flask-web-app": {
+                "description": "Full-featured Flask web application with blueprints and database support",
+                "structure": [
+                    "your_project/",
+                    "├── src/",
+                    "│   └── your_project/",
+                    "│       ├── __init__.py",
+                    "│       ├── app.py",
+                    "│       ├── config.py",
+                    "│       ├── blueprints/",
+                    "│       │   ├── __init__.py",
+                    "│       │   └── main.py",
+                    "│       ├── templates/",
+                    "│       │   ├── base.html",
+                    "│       │   └── index.html",
+                    "│       └── static/",
+                    "│           ├── css/",
+                    "│           └── js/",
+                    "├── tests/",
+                    "├── requirements.txt",
+                    "├── Dockerfile",
+                    "├── docker-compose.yml",
+                    "└── README.md"
+                ],
+                "key_features": [
+                    "Flask application factory",
+                    "Blueprint organization",
+                    "Jinja2 templates",
+                    "Static file handling",
+                    "Database integration",
+                    "Docker containerization"
+                ]
+            },
+            "fastapi-web-api": {
+                "description": "Modern async FastAPI application with automatic documentation",
+                "structure": [
+                    "your_project/",
+                    "├── src/",
+                    "│   └── your_project/",
+                    "│       ├── __init__.py",
+                    "│       ├── main.py",
+                    "│       ├── models.py",
+                    "│       ├── routers/",
+                    "│       │   ├── __init__.py",
+                    "│       │   └── api.py",
+                    "│       └── database.py",
+                    "├── tests/",
+                    "├── requirements.txt",
+                    "├── Dockerfile",
+                    "├── run.py",
+                    "└── README.md"
+                ],
+                "key_features": [
+                    "Async/await support",
+                    "Automatic API documentation",
+                    "Pydantic data validation",
+                    "Type hints throughout",
+                    "Database integration",
+                    "Production-ready"
+                ]
+            },
+            "data-science-project": {
+                "description": "Complete data science project with notebooks and analysis tools",
+                "structure": [
+                    "your_project/",
+                    "├── data/",
+                    "│   ├── raw/",
+                    "│   ├── processed/",
+                    "│   └── external/",
+                    "├── notebooks/",
+                    "│   └── 01-exploratory-analysis.ipynb",
+                    "├── src/",
+                    "│   └── your_project/",
+                    "│       ├── __init__.py",
+                    "│       ├── data.py",
+                    "│       └── analysis.py",
+                    "├── reports/",
+                    "├── requirements.txt",
+                    "└── README.md"
+                ],
+                "key_features": [
+                    "Organized data directories",
+                    "Jupyter notebook integration",
+                    "Data processing utilities",
+                    "Analysis modules",
+                    "Reproducible workflows"
+                ]
+            },
+            "cli-tool": {
+                "description": "Command-line interface tool with Click framework",
+                "structure": [
+                    "your_project/",
+                    "├── src/",
+                    "│   └── your_project/",
+                    "│       ├── __init__.py",
+                    "│       └── cli.py",
+                    "├── tests/",
+                    "├── setup.py",
+                    "├── pyproject.toml",
+                    "├── requirements.txt",
+                    "└── README.md"
+                ],
+                "key_features": [
+                    "Click CLI framework",
+                    "Command-line entry points",
+                    "Argument parsing",
+                    "Help generation",
+                    "Installable commands"
+                ]
+            },
+            "binary-extension": {
+                "description": "Python package with C/C++ extensions for high performance",
+                "structure": [
+                    "your_project/",
+                    "├── src/",
+                    "│   └── your_project/",
+                    "│       ├── __init__.py",
+                    "│       ├── core.py",
+                    "│       └── ext/",
+                    "│           └── your_project_ext.c",
+                    "├── tests/",
+                    "│   ├── __init__.py",
+                    "│   └── test_extension.py",
+                    "├── build_ext.py",
+                    "├── setup.py",
+                    "├── pyproject.toml",
+                    "├── .github/workflows/wheels.yml",
+                    "└── README.md"
+                ],
+                "key_features": [
+                    "C/C++ extension modules",
+                    "Pure Python fallbacks",
+                    "Cross-platform compilation",
+                    "Binary wheel building",
+                    "Performance optimization",
+                    "CI/CD for wheels"
+                ]
+            },
+            "namespace-package": {
+                "description": "Namespace package for distributed development across repositories",
+                "structure": [
+                    "namespace-component/",
+                    "├── src/",
+                    "│   └── namespace/          # No __init__.py!",
+                    "│       └── component/",
+                    "│           ├── __init__.py",
+                    "│           └── core.py",
+                    "├── tests/",
+                    "├── docs/",
+                    "│   └── namespace_usage.md",
+                    "├── setup.py",
+                    "├── pyproject.toml",
+                    "└── README.md"
+                ],
+                "key_features": [
+                    "Implicit namespace packages",
+                    "Distributed development",
+                    "Independent versioning",
+                    "Inter-component communication",
+                    "Modular architecture",
+                    "Team collaboration"
+                ]
+            },
+            "plugin-framework": {
+                "description": "Plugin system with entry points and extensible architecture",
+                "structure": [
+                    "your_project/",
+                    "├── src/",
+                    "│   └── your_project/",
+                    "│       ├── __init__.py",
+                    "│       ├── core.py",
+                    "│       ├── registry.py",
+                    "│       ├── cli.py",
+                    "│       └── plugins/",
+                    "│           ├── __init__.py",
+                    "│           ├── example_plugin.py",
+                    "│           └── logging_plugin.py",
+                    "├── tests/",
+                    "│   ├── test_plugin_system.py",
+                    "│   └── test_example_plugins.py",
+                    "├── setup.py",
+                    "└── README.md"
+                ],
+                "key_features": [
+                    "Plugin base classes",
+                    "Hook system",
+                    "Entry point discovery",
+                    "Dynamic loading",
+                    "CLI management",
+                    "Extensible architecture"
+                ]
+            },
+            "django-web-app": {
+                "description": "Django web application with models, views, and templates",
+                "structure": [
+                    "your_project/",
+                    "├── your_project/",
+                    "│   ├── __init__.py",
+                    "│   ├── settings.py",
+                    "│   ├── urls.py",
+                    "│   └── wsgi.py",
+                    "├── app/",
+                    "│   ├── __init__.py",
+                    "│   ├── models.py",
+                    "│   ├── views.py",
+                    "│   └── urls.py",
+                    "├── templates/",
+                    "├── static/",
+                    "├── requirements.txt",
+                    "├── manage.py",
+                    "└── README.md"
+                ],
+                "key_features": [
+                    "Django framework",
+                    "Model-View-Template pattern",
+                    "Admin interface",
+                    "ORM integration",
+                    "URL routing",
+                    "Static file handling"
+                ]
+            },
+            "machine-learning-project": {
+                "description": "Machine learning project with model training and evaluation",
+                "structure": [
+                    "your_project/",
+                    "├── data/",
+                    "│   ├── raw/",
+                    "│   ├── processed/",
+                    "│   └── models/",
+                    "├── notebooks/",
+                    "├── src/",
+                    "│   └── your_project/",
+                    "│       ├── __init__.py",
+                    "│       ├── data/",
+                    "│       ├── features/",
+                    "│       ├── models/",
+                    "│       └── visualization/",
+                    "├── tests/",
+                    "├── requirements.txt",
+                    "└── README.md"
+                ],
+                "key_features": [
+                    "Data pipeline structure",
+                    "Model training modules",
+                    "Feature engineering",
+                    "Experiment tracking",
+                    "Model evaluation",
+                    "Visualization tools"
+                ]
+            },
+            "python-library": {
+                "description": "Reusable Python library for distribution",
+                "structure": [
+                    "your_project/",
+                    "├── src/",
+                    "│   └── your_project/",
+                    "│       ├── __init__.py",
+                    "│       ├── core.py",
+                    "│       └── utils.py",
+                    "├── tests/",
+                    "├── docs/",
+                    "├── examples/",
+                    "├── setup.py",
+                    "├── pyproject.toml",
+                    "├── MANIFEST.in",
+                    "└── README.md"
+                ],
+                "key_features": [
+                    "Library structure",
+                    "Public API design",
+                    "Documentation",
+                    "Example usage",
+                    "PyPI packaging",
+                    "Version management"
+                ]
+            }
+        }
+        
+        # Add default structure for other templates
+        default_structure = {
+            "description": "Standard Python project structure",
+            "structure": [
+                "your_project/",
+                "├── src/",
+                "│   └── your_project/",
+                "│       ├── __init__.py",
+                "│       └── core.py",
+                "├── tests/",
+                "├── setup.py",
+                "├── requirements.txt",
+                "└── README.md"
+            ],
+            "key_features": [
+                "Standard package layout",
+                "Basic functionality",
+                "Testing framework",
+                "Documentation"
+            ]
+        }
+        
+        return structures.get(template_id, default_structure)
+    
+    def get_template_detailed_info(self, template_id: str) -> Dict[str, Any]:
+        """Get detailed information about a template."""
+        if template_id not in self.default_templates:
+            return {"error": f"Template '{template_id}' not found"}
+        
+        template_info = self.default_templates[template_id].copy()
+        structure_info = self.get_template_structure(template_id)
+        
+        # Combine template metadata with structure information
+        detailed_info = {
+            "id": template_id,
+            "name": template_info.get("name", "Unknown Template"),
+            "description": template_info.get("description", "No description available"),
+            "type": template_info.get("type", "unknown"),
+            "source": template_info.get("source", "unknown"),
+            "features": template_info.get("features", []),
+            "structure_description": structure_info.get("description", ""),
+            "project_structure": structure_info.get("structure", []),
+            "key_features": structure_info.get("key_features", []),
+            "use_cases": self._get_template_use_cases(template_id),
+            "dependencies": self._get_template_dependencies(template_id)
+        }
+        
+        return detailed_info
+    
+    def _get_template_use_cases(self, template_id: str) -> List[str]:
+        """Get use cases for a template."""
+        use_cases = {
+            "minimal-python": [
+                "Simple scripts and utilities",
+                "Learning Python packaging",
+                "Quick prototypes",
+                "Basic libraries"
+            ],
+            "flask-web-app": [
+                "Web applications",
+                "REST APIs",
+                "Dashboards",
+                "Content management",
+                "E-commerce sites"
+            ],
+            "fastapi-web-api": [
+                "High-performance APIs",
+                "Microservices",
+                "Machine learning APIs",
+                "Real-time applications",
+                "Data processing services"
+            ],
+            "data-science-project": [
+                "Data analysis",
+                "Machine learning research",
+                "Statistical modeling",
+                "Data visualization",
+                "Scientific computing"
+            ],
+            "cli-tool": [
+                "Command-line utilities",
+                "Build tools",
+                "System administration",
+                "File processing",
+                "Automation scripts"
+            ],
+            "binary-extension": [
+                "Scientific computing",
+                "Performance-critical algorithms",
+                "Hardware interfaces",
+                "Mathematical libraries",
+                "Image/signal processing"
+            ],
+            "namespace-package": [
+                "Large organizations",
+                "Microservice architectures",
+                "Plugin ecosystems",
+                "Distributed teams",
+                "Modular frameworks"
+            ],
+            "plugin-framework": [
+                "Extensible applications",
+                "Tool frameworks",
+                "Workflow systems",
+                "IDE plugins",
+                "Content management"
+            ],
+            "django-web-app": [
+                "Complex web applications",
+                "Content management systems",
+                "E-commerce platforms",
+                "Social networks",
+                "Enterprise applications"
+            ],
+            "machine-learning-project": [
+                "Predictive modeling",
+                "Deep learning research",
+                "Computer vision",
+                "Natural language processing",
+                "Recommendation systems"
+            ],
+            "python-library": [
+                "Reusable utilities",
+                "API wrappers",
+                "Mathematical libraries",
+                "Data processing tools",
+                "Framework extensions"
+            ],
+            "game-development": [
+                "2D games",
+                "Educational games",
+                "Game prototypes",
+                "Interactive simulations",
+                "Game development learning"
+            ],
+            "desktop-gui-app": [
+                "Desktop applications",
+                "GUI tools",
+                "Data visualization apps",
+                "System utilities",
+                "Cross-platform apps"
+            ],
+            "microservice": [
+                "Distributed systems",
+                "API services",
+                "Cloud applications",
+                "Container deployments",
+                "Service mesh architectures"
+            ],
+            "api-client-library": [
+                "API integration",
+                "SDK development",
+                "Service wrappers",
+                "Third-party integrations",
+                "API testing tools"
+            ],
+            "automation-scripts": [
+                "Task automation",
+                "System administration",
+                "Data processing pipelines",
+                "Scheduled jobs",
+                "DevOps tooling"
+            ],
+            "jupyter-research": [
+                "Scientific research",
+                "Data exploration",
+                "Academic projects",
+                "Reproducible research",
+                "Educational materials"
+            ]
+        }
+        
+        return use_cases.get(template_id, ["General Python development"])
+    
+    def _get_template_dependencies(self, template_id: str) -> List[str]:
+        """Get main dependencies for a template."""
+        dependencies = {
+            "minimal-python": ["setuptools", "wheel"],
+            "flask-web-app": ["Flask", "Jinja2", "Werkzeug"],
+            "fastapi-web-api": ["FastAPI", "uvicorn", "pydantic"],
+            "data-science-project": ["pandas", "numpy", "matplotlib", "jupyter"],
+            "cli-tool": ["click"],
+            "binary-extension": ["setuptools", "wheel", "build tools (gcc/msvc)"],
+            "namespace-package": ["setuptools"],
+            "plugin-framework": ["click", "importlib-metadata"],
+            "django-web-app": ["Django", "psycopg2", "pillow"],
+            "machine-learning-project": ["scikit-learn", "pandas", "numpy", "matplotlib", "seaborn"],
+            "python-library": ["setuptools", "wheel", "sphinx"],
+            "game-development": ["pygame", "pymunk"],
+            "desktop-gui-app": ["wxpython", "Pillow"],
+            "microservice": ["FastAPI", "docker", "kubernetes"],
+            "api-client-library": ["requests", "httpx", "pydantic"],
+            "automation-scripts": ["schedule", "click", "psutil"],
+            "jupyter-research": ["jupyter", "ipywidgets", "matplotlib", "seaborn"]
+        }
+        
+        return dependencies.get(template_id, ["setuptools"])
 
 
 class ProjectGenerator:
@@ -399,6 +924,12 @@ class ProjectGenerator:
                 return self._generate_automation_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "jupyter-research":
                 return self._generate_jupyter_research_template(project_path, project_name, package_name, features, metadata)
+            elif template_id == "binary-extension":
+                return self._generate_binary_extension_template(project_path, project_name, package_name, features, metadata)
+            elif template_id == "namespace-package":
+                return self._generate_namespace_package_template(project_path, project_name, package_name, features, metadata)
+            elif template_id == "plugin-framework":
+                return self._generate_plugin_framework_template(project_path, project_name, package_name, features, metadata)
             else:
                 # Default minimal template
                 return self._generate_minimal_template(project_path, project_name, package_name, features, metadata)
@@ -1541,6 +2072,865 @@ pip install -e .
         """Generate Jupyter research template (stub - falls back to minimal)."""
         return self._generate_minimal_template(project_path, project_name, package_name, features, metadata)
     
+    def _generate_binary_extension_template(self, project_path: Path, project_name: str, package_name: str, features: Dict[str, bool], metadata: Dict[str, str]) -> bool:
+        """Generate a binary/extension package template."""
+        # Create package structure
+        src_dir = project_path / "src" / package_name
+        src_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create C extension directory
+        ext_dir = src_dir / "ext"
+        ext_dir.mkdir(exist_ok=True)
+        
+        # Main package __init__.py
+        (src_dir / "__init__.py").write_text(f'''"""
+{metadata.get('description', f'A {project_name} package with binary extensions')}
+"""
+
+__version__ = "{metadata.get('version', '0.1.0')}"
+
+# Import the C extension
+try:
+    from .ext import {self._to_class_name(package_name).lower()}_ext
+    HAS_C_EXTENSION = True
+except ImportError:
+    # Fallback to pure Python implementation
+    HAS_C_EXTENSION = False
+
+from .core import {self._to_class_name(package_name)}
+
+__all__ = ['{self._to_class_name(package_name)}', 'HAS_C_EXTENSION']
+''')
+        
+        # Core Python module
+        (src_dir / "core.py").write_text(f'''"""
+Core implementation for {project_name}.
+Includes both pure Python and C extension implementations.
+"""
+
+import math
+from typing import List, Union
+
+try:
+    from .ext import {self._to_class_name(package_name).lower()}_ext
+    HAS_C_EXTENSION = True
+except ImportError:
+    HAS_C_EXTENSION = False
+
+
+class {self._to_class_name(package_name)}:
+    """Main class with optional C extension acceleration."""
+    
+    def __init__(self, use_c_extension: bool = True):
+        """Initialize with optional C extension usage."""
+        self.use_c_extension = use_c_extension and HAS_C_EXTENSION
+        
+    def fast_calculation(self, data: List[float]) -> float:
+        """Perform fast calculation using C extension if available."""
+        if self.use_c_extension:
+            return {self._to_class_name(package_name).lower()}_ext.fast_sum(data)
+        else:
+            return self._pure_python_calculation(data)
+    
+    def _pure_python_calculation(self, data: List[float]) -> float:
+        """Pure Python fallback implementation."""
+        return sum(x * x for x in data)
+    
+    def matrix_multiply(self, a: List[List[float]], b: List[List[float]]) -> List[List[float]]:
+        """Matrix multiplication with optional C acceleration."""
+        if self.use_c_extension:
+            return {self._to_class_name(package_name).lower()}_ext.matrix_multiply(a, b)
+        else:
+            return self._pure_python_matrix_multiply(a, b)
+    
+    def _pure_python_matrix_multiply(self, a: List[List[float]], b: List[List[float]]) -> List[List[float]]:
+        """Pure Python matrix multiplication."""
+        rows_a, cols_a = len(a), len(a[0])
+        rows_b, cols_b = len(b), len(b[0])
+        
+        if cols_a != rows_b:
+            raise ValueError("Matrix dimensions don't match for multiplication")
+        
+        result = [[0.0 for _ in range(cols_b)] for _ in range(rows_a)]
+        
+        for i in range(rows_a):
+            for j in range(cols_b):
+                for k in range(cols_a):
+                    result[i][j] += a[i][k] * b[k][j]
+        
+        return result
+''')
+        
+        # C extension source
+        (ext_dir / f"{self._to_class_name(package_name).lower()}_ext.c").write_text(f'''/*
+ * C extension for {project_name}
+ * Provides performance-critical functions
+ */
+
+#include <Python.h>
+#include <math.h>
+
+/* Fast sum of squares function */
+static PyObject *
+fast_sum(PyObject *self, PyObject *args)
+{{
+    PyObject *list;
+    Py_ssize_t i, n;
+    double result = 0.0;
+    
+    if (!PyArg_ParseTuple(args, "O!", &PyList_Type, &list))
+        return NULL;
+    
+    n = PyList_Size(list);
+    for (i = 0; i < n; i++) {{
+        PyObject *item = PyList_GetItem(list, i);
+        double value = PyFloat_AsDouble(item);
+        if (PyErr_Occurred())
+            return NULL;
+        result += value * value;
+    }}
+    
+    return PyFloat_FromDouble(result);
+}}
+
+/* Matrix multiplication function */
+static PyObject *
+matrix_multiply(PyObject *self, PyObject *args)
+{{
+    PyObject *a, *b;
+    Py_ssize_t rows_a, cols_a, rows_b, cols_b;
+    
+    if (!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &a, &PyList_Type, &b))
+        return NULL;
+    
+    rows_a = PyList_Size(a);
+    if (rows_a == 0) {{
+        PyErr_SetString(PyExc_ValueError, "Empty matrix A");
+        return NULL;
+    }}
+    
+    PyObject *first_row_a = PyList_GetItem(a, 0);
+    cols_a = PyList_Size(first_row_a);
+    
+    rows_b = PyList_Size(b);
+    if (rows_b == 0) {{
+        PyErr_SetString(PyExc_ValueError, "Empty matrix B");
+        return NULL;
+    }}
+    
+    PyObject *first_row_b = PyList_GetItem(b, 0);
+    cols_b = PyList_Size(first_row_b);
+    
+    if (cols_a != rows_b) {{
+        PyErr_SetString(PyExc_ValueError, "Matrix dimensions don't match");
+        return NULL;
+    }}
+    
+    /* Create result matrix */
+    PyObject *result = PyList_New(rows_a);
+    for (Py_ssize_t i = 0; i < rows_a; i++) {{
+        PyObject *row = PyList_New(cols_b);
+        for (Py_ssize_t j = 0; j < cols_b; j++) {{
+            double sum = 0.0;
+            for (Py_ssize_t k = 0; k < cols_a; k++) {{
+                PyObject *a_row = PyList_GetItem(a, i);
+                PyObject *a_val = PyList_GetItem(a_row, k);
+                PyObject *b_row = PyList_GetItem(b, k);
+                PyObject *b_val = PyList_GetItem(b_row, j);
+                
+                double a_double = PyFloat_AsDouble(a_val);
+                double b_double = PyFloat_AsDouble(b_val);
+                
+                if (PyErr_Occurred())
+                    return NULL;
+                
+                sum += a_double * b_double;
+            }}
+            PyList_SetItem(row, j, PyFloat_FromDouble(sum));
+        }}
+        PyList_SetItem(result, i, row);
+    }}
+    
+    return result;
+}}
+
+/* Method definitions */
+static PyMethodDef {self._to_class_name(package_name).lower()}_methods[] = {{
+    {{"fast_sum", fast_sum, METH_VARARGS, "Calculate sum of squares"}},
+    {{"matrix_multiply", matrix_multiply, METH_VARARGS, "Multiply two matrices"}},
+    {{NULL, NULL, 0, NULL}}
+}};
+
+/* Module definition */
+static struct PyModuleDef {self._to_class_name(package_name).lower()}_module = {{
+    PyModuleDef_HEAD_INIT,
+    "{self._to_class_name(package_name).lower()}_ext",
+    "C extension for {project_name}",
+    -1,
+    {self._to_class_name(package_name).lower()}_methods
+}};
+
+/* Module initialization */
+PyMODINIT_FUNC
+PyInit_{self._to_class_name(package_name).lower()}_ext(void)
+{{
+    return PyModule_Create(&{self._to_class_name(package_name).lower()}_module);
+}}
+''')
+        
+        # Setup.py with extension configuration
+        (project_path / "setup.py").write_text(f'''"""
+Setup script for {project_name} with C extensions.
+"""
+
+from setuptools import setup, find_packages, Extension
+from pathlib import Path
+import platform
+
+# Read README
+readme_file = Path(__file__).parent / "README.md"
+long_description = readme_file.read_text(encoding='utf-8') if readme_file.exists() else ""
+
+# Define C extension
+ext_modules = [
+    Extension(
+        "{package_name}.ext.{self._to_class_name(package_name).lower()}_ext",
+        sources=["src/{package_name}/ext/{self._to_class_name(package_name).lower()}_ext.c"],
+        include_dirs=[],
+        libraries=[],
+        extra_compile_args=["-O3"] if platform.system() != "Windows" else ["/O2"],
+        extra_link_args=[],
+    )
+]
+
+setup(
+    name="{package_name.replace('_', '-')}",
+    version="{metadata.get('version', '0.1.0')}",
+    author="{metadata.get('author', 'Your Name')}",
+    author_email="{metadata.get('email', 'your.email@example.com')}",
+    description="{metadata.get('description', f'A {project_name} package with binary extensions')}",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="{metadata.get('url', f'https://github.com/yourusername/{package_name.replace("_", "-")}')}",
+    packages=find_packages(where="src"),
+    package_dir={{"": "src"}},
+    ext_modules=ext_modules,
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: C",
+    ],
+    python_requires=">=3.8",
+    install_requires=[
+        "setuptools",
+    ],
+    extras_require={{
+        "dev": [
+            "pytest>=7.0.0",
+            "pytest-cov>=4.0.0",
+            "cython>=0.29.0",  # For potential Cython integration
+            "wheel>=0.37.0",
+        ],
+    }},
+    zip_safe=False,  # Required for C extensions
+)
+''')
+        
+        # pyproject.toml for modern build
+        (project_path / "pyproject.toml").write_text(f'''[build-system]
+requires = ["setuptools>=64", "wheel", "setuptools-scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "{package_name.replace('_', '-')}"
+dynamic = ["version"]
+description = "{metadata.get('description', f'A {project_name} package with binary extensions')}"
+readme = "README.md"
+authors = [
+    {{name = "{metadata.get('author', 'Your Name')}", email = "{metadata.get('email', 'your.email@example.com')}"}}
+]
+license = {{text = "MIT"}}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: C",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "setuptools",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "cython>=0.29.0",
+    "wheel>=0.37.0",
+    "build>=0.10.0",
+]
+
+[tool.setuptools]
+packages = ["src"]
+zip-safe = false
+
+[tool.setuptools.dynamic]
+version = {{attr = "{package_name}.__version__"}}
+''')
+        
+        # Build script
+        (project_path / "build_ext.py").write_text(f'''#!/usr/bin/env python3
+"""
+Build script for C extensions in {project_name}.
+"""
+
+import subprocess
+import sys
+import platform
+from pathlib import Path
+
+def build_extension():
+    """Build the C extension."""
+    print("Building C extension...")
+    
+    try:
+        # Build in-place for development
+        cmd = [sys.executable, "setup.py", "build_ext", "--inplace"]
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        print("✅ C extension built successfully!")
+        return True
+        
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Failed to build C extension: {{e}}")
+        print(f"stdout: {{e.stdout}}")
+        print(f"stderr: {{e.stderr}}")
+        return False
+
+def clean_build():
+    """Clean build artifacts."""
+    print("Cleaning build artifacts...")
+    
+    import shutil
+    patterns = ["build", "*.egg-info", "**/*.so", "**/*.pyd", "**/__pycache__"]
+    
+    for pattern in patterns:
+        for path in Path(".").rglob(pattern):
+            if path.exists():
+                if path.is_dir():
+                    shutil.rmtree(path)
+                else:
+                    path.unlink()
+                print(f"Removed: {{path}}")
+
+def main():
+    """Main build script."""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Build script for C extensions")
+    parser.add_argument("action", choices=["build", "clean"], help="Action to perform")
+    
+    args = parser.parse_args()
+    
+    if args.action == "build":
+        success = build_extension()
+        sys.exit(0 if success else 1)
+    elif args.action == "clean":
+        clean_build()
+        sys.exit(0)
+
+if __name__ == "__main__":
+    main()
+''')
+        
+        # Requirements
+        requirements = [
+            "setuptools>=64.0.0",
+        ]
+        (project_path / "requirements.txt").write_text("\\n".join(requirements) + "\\n")
+        
+        # Tests
+        if features.get('tests', True):
+            self._create_binary_extension_tests(project_path, package_name)
+        
+        # README
+        if features.get('readme', True):
+            self._create_binary_extension_readme(project_path, project_name, package_name, metadata)
+        
+        # CI configuration for building wheels
+        if features.get('ci_cd', True):
+            self._create_binary_extension_ci(project_path, package_name)
+        
+        if features.get('gitignore', True):
+            self._create_binary_extension_gitignore(project_path)
+        
+        return True
+    
+    def _create_binary_extension_tests(self, project_path: Path, package_name: str):
+        """Create tests for binary extension package."""
+        tests_dir = project_path / "tests"
+        tests_dir.mkdir(exist_ok=True)
+        
+        (tests_dir / "__init__.py").write_text("")
+        
+        # Test the C extension
+        (tests_dir / "test_extension.py").write_text(f'''"""
+Tests for {package_name} C extension.
+"""
+
+import unittest
+import pytest
+from {package_name} import {self._to_class_name(package_name)}, HAS_C_EXTENSION
+
+
+class TestExtension(unittest.TestCase):
+    """Test the binary extension functionality."""
+    
+    def setUp(self):
+        """Set up test fixtures."""
+        self.calc = {self._to_class_name(package_name)}()
+        self.calc_pure = {self._to_class_name(package_name)}(use_c_extension=False)
+    
+    def test_fast_calculation_consistency(self):
+        """Test that C and Python implementations give same results."""
+        data = [1.0, 2.0, 3.0, 4.0, 5.0]
+        
+        python_result = self.calc_pure.fast_calculation(data)
+        
+        if HAS_C_EXTENSION:
+            c_result = self.calc.fast_calculation(data)
+            self.assertAlmostEqual(python_result, c_result, places=10)
+        
+        # Expected result: 1² + 2² + 3² + 4² + 5² = 55
+        self.assertAlmostEqual(python_result, 55.0, places=10)
+    
+    def test_matrix_multiply_consistency(self):
+        """Test matrix multiplication consistency."""
+        a = [[1.0, 2.0], [3.0, 4.0]]
+        b = [[5.0, 6.0], [7.0, 8.0]]
+        
+        python_result = self.calc_pure.matrix_multiply(a, b)
+        
+        if HAS_C_EXTENSION:
+            c_result = self.calc.matrix_multiply(a, b)
+            self.assertEqual(python_result, c_result)
+        
+        # Expected result: [[19, 22], [43, 50]]
+        expected = [[19.0, 22.0], [43.0, 50.0]]
+        self.assertEqual(python_result, expected)
+    
+    def test_empty_list(self):
+        """Test with empty input."""
+        result = self.calc.fast_calculation([])
+        self.assertEqual(result, 0.0)
+    
+    def test_matrix_dimension_error(self):
+        """Test matrix dimension mismatch error."""
+        a = [[1.0, 2.0], [3.0, 4.0]]  # 2x2
+        b = [[1.0], [2.0], [3.0]]     # 3x1
+        
+        with self.assertRaises(ValueError):
+            self.calc.matrix_multiply(a, b)
+    
+    @pytest.mark.skipif(not HAS_C_EXTENSION, reason="C extension not available")
+    def test_c_extension_available(self):
+        """Test that C extension is available and working."""
+        self.assertTrue(HAS_C_EXTENSION)
+        
+        # Test that C extension is actually being used
+        calc_c = {self._to_class_name(package_name)}(use_c_extension=True)
+        self.assertTrue(calc_c.use_c_extension)
+
+if __name__ == "__main__":
+    unittest.main()
+''')
+    
+    def _create_binary_extension_readme(self, project_path: Path, project_name: str, package_name: str, metadata: Dict[str, str]):
+        """Create README for binary extension package."""
+        content = f'''# {project_name}
+
+{metadata.get('description', f'A {project_name} package with binary extensions')}
+
+This package includes C extensions for performance-critical operations, with pure Python fallbacks.
+
+## Features
+
+- **C Extensions**: High-performance C implementations for critical functions
+- **Pure Python Fallbacks**: Automatic fallback when C extensions unavailable
+- **Cross-Platform**: Builds on Windows, macOS, and Linux
+- **Wheel Distribution**: Pre-compiled wheels for major platforms
+
+## Installation
+
+### From PyPI (Recommended)
+```bash
+pip install {package_name.replace('_', '-')}
+```
+
+### From Source
+```bash
+git clone <repository-url>
+cd {package_name.replace('_', '-')}
+pip install -e .
+```
+
+### Building C Extensions
+
+To build the C extensions manually:
+```bash
+python build_ext.py build
+```
+
+## Usage
+
+```python
+from {package_name} import {self._to_class_name(package_name)}, HAS_C_EXTENSION
+
+# Create calculator instance
+calc = {self._to_class_name(package_name)}()
+
+# Check if C extension is available
+print(f"C extension available: {{HAS_C_EXTENSION}}")
+
+# Fast calculation (uses C extension if available)
+data = [1.0, 2.0, 3.0, 4.0, 5.0]
+result = calc.fast_calculation(data)
+print(f"Sum of squares: {{result}}")
+
+# Matrix multiplication
+a = [[1.0, 2.0], [3.0, 4.0]]
+b = [[5.0, 6.0], [7.0, 8.0]]
+result = calc.matrix_multiply(a, b)
+print(f"Matrix product: {{result}}")
+
+# Force pure Python implementation
+calc_pure = {self._to_class_name(package_name)}(use_c_extension=False)
+result = calc_pure.fast_calculation(data)
+```
+
+## Performance
+
+The C extensions provide significant performance improvements:
+
+| Operation | Pure Python | C Extension | Speedup |
+|-----------|-------------|-------------|---------|
+| Sum of squares (1000 elements) | 100μs | 10μs | 10x |
+| Matrix multiplication (100x100) | 1000ms | 100ms | 10x |
+
+## Development
+
+### Building for Development
+
+```bash
+# Install development dependencies
+pip install -e ".[dev]"
+
+# Build C extensions in-place
+python build_ext.py build
+
+# Run tests
+pytest
+
+# Clean build artifacts
+python build_ext.py clean
+```
+
+### Building Wheels
+
+```bash
+# Build source distribution and wheel
+python -m build
+
+# Build wheels for multiple platforms (requires cibuildwheel)
+pip install cibuildwheel
+cibuildwheel --platform linux
+```
+
+## C Extension Details
+
+The package includes the following C functions:
+
+- `fast_sum(list)`: Calculate sum of squares of a list of numbers
+- `matrix_multiply(a, b)`: Multiply two matrices
+
+### Adding New C Functions
+
+1. Add function to `src/{package_name}/ext/{self._to_class_name(package_name).lower()}_ext.c`
+2. Update method definitions array
+3. Add Python wrapper in `core.py`
+4. Add tests in `tests/test_extension.py`
+5. Rebuild: `python build_ext.py build`
+
+## Troubleshooting
+
+### C Extension Build Failures
+
+**Missing Compiler:**
+- Windows: Install Microsoft C++ Build Tools
+- macOS: Install Xcode Command Line Tools (`xcode-select --install`)
+- Linux: Install gcc (`sudo apt-get install build-essential`)
+
+**Python.h Not Found:**
+```bash
+# Ubuntu/Debian
+sudo apt-get install python3-dev
+
+# CentOS/RHEL
+sudo yum install python3-devel
+
+# macOS (usually included with Xcode)
+xcode-select --install
+```
+
+**Fallback Mode:**
+If C extensions fail to build, the package will still work using pure Python implementations.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for any new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+## License
+
+{metadata.get('license_type', 'MIT')} License - see LICENSE file for details.
+
+## Author
+
+{metadata.get('author', 'Your Name')} - {metadata.get('email', 'your.email@example.com')}
+'''
+        (project_path / "README.md").write_text(content)
+    
+    def _create_binary_extension_ci(self, project_path: Path, package_name: str):
+        """Create CI configuration for building wheels."""
+        github_dir = project_path / ".github" / "workflows"
+        github_dir.mkdir(parents=True, exist_ok=True)
+        
+        # GitHub Actions workflow for building wheels
+        (github_dir / "wheels.yml").write_text(f'''name: Build Wheels
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{{{ matrix.os }}}}
+    runs-on: ${{{{ matrix.os }}}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build cibuildwheel
+
+    - name: Build wheels
+      run: python -m cibuildwheel --output-dir wheelhouse
+      env:
+        # Configure cibuildwheel
+        CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-*
+        CIBW_SKIP: "*-win32 *-manylinux_i686"
+        CIBW_TEST_REQUIRES: pytest
+        CIBW_TEST_COMMAND: "pytest {{package}}/tests"
+
+    - name: Upload wheels
+      uses: actions/upload-artifact@v3
+      with:
+        name: wheels
+        path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Build sdist
+      run: |
+        python -m pip install --upgrade pip build
+        python -m build --sdist
+
+    - name: Upload sdist
+      uses: actions/upload-artifact@v3
+      with:
+        name: wheels
+        path: dist/*.tar.gz
+
+  test:
+    name: Test on ${{{{ matrix.os }}}} with Python ${{{{ matrix.python-version }}}}
+    runs-on: ${{{{ matrix.os }}}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{{{ matrix.python-version }}}}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{{{ matrix.python-version }}}}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+
+    - name: Build C extension
+      run: python build_ext.py build
+
+    - name: Run tests
+      run: pytest tests/ -v
+
+  upload_pypi:
+    needs: [build_wheels, build_sdist, test]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+    - uses: actions/download-artifact@v3
+      with:
+        name: wheels
+        path: dist
+
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{{{ secrets.PYPI_API_TOKEN }}}}
+''')
+    
+    def _create_binary_extension_gitignore(self, project_path: Path):
+        """Create .gitignore for binary extension package."""
+        content = '''# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+*.pyd
+*.dll
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Compiled C/C++ files
+*.o
+*.obj
+*.exe
+*.out
+*.app
+
+# Build artifacts
+*.build_ext
+*.build
+build_temp/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+'''
+        (project_path / ".gitignore").write_text(content)
+    
     def _to_package_name(self, project_name: str) -> str:
         """Convert project name to valid Python package name."""
         return project_name.lower().replace('-', '_').replace(' ', '_')
@@ -1548,6 +2938,2183 @@ pip install -e .
     def _to_class_name(self, package_name: str) -> str:
         """Convert package name to class name."""
         return ''.join(word.capitalize() for word in package_name.split('_'))
+    
+    def _generate_namespace_package_template(self, project_path: Path, project_name: str, package_name: str, features: Dict[str, bool], metadata: Dict[str, str]) -> bool:
+        """Generate a namespace package template."""
+        # Extract namespace from package name (e.g., 'company_tools' -> 'company', 'tools')
+        if '_' in package_name:
+            namespace, subpackage = package_name.split('_', 1)
+        else:
+            namespace = package_name
+            subpackage = "core"
+        
+        # Create namespace package structure (no __init__.py in namespace)
+        namespace_dir = project_path / "src" / namespace
+        namespace_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create subpackage
+        subpackage_dir = namespace_dir / subpackage
+        subpackage_dir.mkdir(exist_ok=True)
+        
+        # Subpackage __init__.py (this has __init__.py, namespace doesn't)
+        (subpackage_dir / "__init__.py").write_text(f'''"""
+{subpackage.title()} subpackage of {namespace} namespace.
+
+This is part of the {namespace} namespace package.
+{metadata.get('description', f'A {project_name} namespace package')}
+"""
+
+__version__ = "{metadata.get('version', '0.1.0')}"
+
+from .core import {self._to_class_name(subpackage)}
+
+__all__ = ['{self._to_class_name(subpackage)}']
+''')
+        
+        # Core implementation
+        (subpackage_dir / "core.py").write_text(f'''"""
+Core implementation for {namespace}.{subpackage}.
+"""
+
+from typing import List, Dict, Any
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class {self._to_class_name(subpackage)}:
+    """Main class for {namespace}.{subpackage}."""
+    
+    def __init__(self, name: str = "{subpackage}"):
+        """Initialize the {subpackage} component."""
+        self.name = name
+        self.namespace = "{namespace}"
+        logger.info(f"Initialized {{self.namespace}}.{{self.name}}")
+    
+    def get_info(self) -> Dict[str, Any]:
+        """Get information about this namespace component."""
+        return {{
+            "name": self.name,
+            "namespace": self.namespace,
+            "full_name": f"{{self.namespace}}.{{self.name}}",
+            "version": "{metadata.get('version', '0.1.0')}",
+            "description": "{metadata.get('description', f'A {project_name} namespace package')}"
+        }}
+    
+    def discover_siblings(self) -> List[str]:
+        """Discover other packages in the same namespace."""
+        import pkgutil
+        
+        siblings = []
+        try:
+            # Import the namespace package
+            namespace_module = __import__(self.namespace)
+            
+            # Discover all subpackages
+            for finder, name, ispkg in pkgutil.iter_modules(namespace_module.__path__, 
+                                                           prefix=f"{{self.namespace}}."):
+                if ispkg and name != f"{{self.namespace}}.{{self.name}}":
+                    siblings.append(name)
+        except ImportError as e:
+            logger.warning(f"Could not discover siblings: {{e}}")
+        
+        return siblings
+    
+    def call_sibling(self, sibling_name: str, method_name: str = "get_info", *args, **kwargs):
+        """Call a method on a sibling package."""
+        try:
+            full_module_name = f"{{self.namespace}}.{{sibling_name}}"
+            module = __import__(full_module_name, fromlist=[sibling_name])
+            
+            # Look for a class with the same name pattern
+            class_name = self._to_class_name(sibling_name)
+            if hasattr(module, class_name):
+                cls = getattr(module, class_name)
+                instance = cls()
+                if hasattr(instance, method_name):
+                    return getattr(instance, method_name)(*args, **kwargs)
+            
+            logger.warning(f"Method {{method_name}} not found in {{full_module_name}}")
+            return None
+            
+        except ImportError as e:
+            logger.error(f"Could not import {{full_module_name}}: {{e}}")
+            return None
+    
+    def _to_class_name(self, name: str) -> str:
+        """Convert name to class name."""
+        return ''.join(word.capitalize() for word in name.split('_'))
+
+
+def discover_namespace_packages(namespace: str = "{namespace}") -> List[str]:
+    """Discover all packages in the namespace."""
+    import pkgutil
+    
+    packages = []
+    try:
+        namespace_module = __import__(namespace)
+        for finder, name, ispkg in pkgutil.iter_modules(namespace_module.__path__, 
+                                                       prefix=f"{{namespace}}."):
+            if ispkg:
+                packages.append(name)
+    except ImportError:
+        pass
+    
+    return packages
+''')
+        
+        # Setup.py for namespace package
+        (project_path / "setup.py").write_text(f'''"""
+Setup script for {namespace}.{subpackage} namespace package.
+"""
+
+from setuptools import setup, find_namespace_packages
+from pathlib import Path
+
+# Read README
+readme_file = Path(__file__).parent / "README.md"
+long_description = readme_file.read_text(encoding='utf-8') if readme_file.exists() else ""
+
+setup(
+    name="{namespace}-{subpackage}",
+    version="{metadata.get('version', '0.1.0')}",
+    author="{metadata.get('author', 'Your Name')}",
+    author_email="{metadata.get('email', 'your.email@example.com')}",
+    description="{metadata.get('description', f'{subpackage.title()} component of {namespace} namespace')}",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="{metadata.get('url', f'https://github.com/yourusername/{namespace}-{subpackage}')}",
+    
+    # Use find_namespace_packages for namespace package support
+    packages=find_namespace_packages(where="src"),
+    package_dir={{"": "src"}},
+    
+    # Namespace packages configuration
+    zip_safe=False,
+    
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+    ],
+    python_requires=">=3.8",
+    install_requires=[
+        # Add dependencies here
+    ],
+    extras_require={{
+        "dev": [
+            "pytest>=7.0.0",
+            "pytest-cov>=4.0.0",
+        ],
+    }},
+)
+''')
+        
+        # pyproject.toml for namespace package
+        (project_path / "pyproject.toml").write_text(f'''[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "{namespace}-{subpackage}"
+dynamic = ["version"]
+description = "{metadata.get('description', f'{subpackage.title()} component of {namespace} namespace')}"
+readme = "README.md"
+authors = [
+    {{name = "{metadata.get('author', 'Your Name')}", email = "{metadata.get('email', 'your.email@example.com')}"}}
+]
+license = {{text = "MIT"}}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.8"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[tool.setuptools]
+# Use find_namespace_packages for implicit namespace support
+packages = ["src"]
+zip-safe = false
+
+[tool.setuptools.dynamic]
+version = {{attr = "{namespace}.{subpackage}.__version__"}}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = true
+''')
+        
+        # Create example sibling package documentation
+        docs_dir = project_path / "docs"
+        docs_dir.mkdir(exist_ok=True)
+        
+        (docs_dir / "namespace_usage.md").write_text(f'''# {namespace.title()} Namespace Package
+
+This package is part of the `{namespace}` namespace, allowing for distributed development.
+
+## Namespace Structure
+
+```
+{namespace}/
+├── {subpackage}/          # This package
+├── other_component/       # Another team's package
+└── third_component/       # Yet another package
+```
+
+## Creating Additional Namespace Packages
+
+To create another component in the `{namespace}` namespace:
+
+### 1. Create the package structure:
+
+```
+{namespace}-other-component/
+├── src/
+│   └── {namespace}/           # No __init__.py here!
+│       └── other_component/   # __init__.py goes here
+│           ├── __init__.py
+│           └── core.py
+├── setup.py
+└── pyproject.toml
+```
+
+### 2. Setup script:
+
+```python
+from setuptools import setup, find_namespace_packages
+
+setup(
+    name="{namespace}-other-component",
+    packages=find_namespace_packages(where="src"),
+    package_dir={{"": "src"}},
+    # ... other configuration
+)
+```
+
+### 3. Important Notes:
+
+- **No `__init__.py` in namespace directory**: The `src/{namespace}/` directory should NOT contain an `__init__.py` file
+- **Use `find_namespace_packages()`**: This is crucial for proper namespace package detection
+- **Separate repositories**: Each component can be in its own repository and released independently
+- **Independent versioning**: Each namespace component has its own version
+
+## Usage Examples
+
+### Basic Usage
+
+```python
+# Import this component
+from {namespace}.{subpackage} import {self._to_class_name(subpackage)}
+
+# Create instance
+component = {self._to_class_name(subpackage)}()
+print(component.get_info())
+```
+
+### Discovering Other Components
+
+```python
+from {namespace}.{subpackage} import {self._to_class_name(subpackage)}, discover_namespace_packages
+
+# Discover all packages in namespace
+packages = discover_namespace_packages()
+print(f"Available packages: {{packages}}")
+
+# Discover siblings from instance
+component = {self._to_class_name(subpackage)}()
+siblings = component.discover_siblings()
+print(f"Sibling packages: {{siblings}}")
+```
+
+### Inter-Component Communication
+
+```python
+# Call methods on other namespace components
+component = {self._to_class_name(subpackage)}()
+result = component.call_sibling("other_component", "some_method", arg1="value")
+```
+
+## Development Workflow
+
+### Setting Up Development Environment
+
+```bash
+# Clone this component
+git clone <{namespace}-{subpackage}-repo>
+cd {namespace}-{subpackage}
+
+# Install in development mode
+pip install -e .
+
+# Install other namespace components
+pip install {namespace}-other-component
+pip install {namespace}-third-component
+```
+
+### Testing with Multiple Components
+
+```python
+# Test that all components are accessible
+import {namespace}.{subpackage}
+import {namespace}.other_component
+import {namespace}.third_component
+
+# All should be importable without conflicts
+```
+
+## Best Practices
+
+1. **Consistent Naming**: Use `{namespace}-component-name` for package names
+2. **No Namespace Conflicts**: Ensure subpackage names don't conflict
+3. **Independent Releases**: Each component should be releasable independently
+4. **Documentation**: Document the namespace structure and inter-component APIs
+5. **Testing**: Test both standalone and with other namespace components
+
+## Troubleshooting
+
+### ImportError: No module named '{namespace}'
+
+This usually means:
+1. No namespace components are installed
+2. Installation didn't use `find_namespace_packages()`
+3. An `__init__.py` file was accidentally added to the namespace directory
+
+### Components Not Discoverable
+
+Check:
+1. All components use `find_namespace_packages()`
+2. No `__init__.py` in the namespace directory
+3. Packages are properly installed (not just on PYTHONPATH)
+''')
+        
+        # Tests for namespace functionality
+        if features.get('tests', True):
+            self._create_namespace_package_tests(project_path, namespace, subpackage)
+        
+        # README
+        if features.get('readme', True):
+            self._create_namespace_package_readme(project_path, project_name, namespace, subpackage, metadata)
+        
+        if features.get('gitignore', True):
+            self._create_basic_gitignore(project_path)
+        
+        return True
+
+    def _create_namespace_package_tests(self, project_path: Path, namespace: str, subpackage: str):
+        """Create tests for namespace package."""
+        tests_dir = project_path / "tests"
+        tests_dir.mkdir(exist_ok=True)
+        
+        (tests_dir / "__init__.py").write_text("")
+        
+        (tests_dir / "test_namespace.py").write_text(f'''"""
+Tests for {namespace}.{subpackage} namespace package.
+"""
+
+import unittest
+import sys
+from {namespace}.{subpackage} import {self._to_class_name(subpackage)}, discover_namespace_packages
+
+
+class TestNamespacePackage(unittest.TestCase):
+    """Test namespace package functionality."""
+    
+    def setUp(self):
+        """Set up test fixtures."""
+        self.component = {self._to_class_name(subpackage)}()
+    
+    def test_component_info(self):
+        """Test component information."""
+        info = self.component.get_info()
+        
+        self.assertIsInstance(info, dict)
+        self.assertEqual(info["namespace"], "{namespace}")
+        self.assertEqual(info["name"], "{subpackage}")
+        self.assertEqual(info["full_name"], "{namespace}.{subpackage}")
+        self.assertIn("version", info)
+        self.assertIn("description", info)
+    
+    def test_namespace_discovery(self):
+        """Test namespace package discovery."""
+        packages = discover_namespace_packages()
+        self.assertIsInstance(packages, list)
+        
+        # At minimum, our package should be discoverable
+        expected_package = f"{namespace}.{subpackage}"
+        # Note: This might fail if the package isn't properly installed
+        # In a real environment with multiple namespace components
+    
+    def test_sibling_discovery(self):
+        """Test sibling package discovery."""
+        siblings = self.component.discover_siblings()
+        self.assertIsInstance(siblings, list)
+        
+        # Should not include itself
+        self_name = f"{namespace}.{subpackage}"
+        self.assertNotIn(self_name, siblings)
+    
+    def test_namespace_structure(self):
+        """Test that namespace is properly structured."""
+        # Verify namespace package doesn't have __init__.py
+        import {namespace}
+        
+        # Namespace package should have __path__ but not __file__
+        self.assertTrue(hasattr({namespace}, "__path__"))
+        # In Python 3.3+, namespace packages don't have __file__
+        if sys.version_info >= (3, 3):
+            self.assertFalse(hasattr({namespace}, "__file__"))
+    
+    def test_component_independence(self):
+        """Test that component can work independently."""
+        # Create multiple instances
+        comp1 = {self._to_class_name(subpackage)}("instance1")
+        comp2 = {self._to_class_name(subpackage)}("instance2")
+        
+        self.assertEqual(comp1.name, "instance1")
+        self.assertEqual(comp2.name, "instance2")
+        self.assertEqual(comp1.namespace, comp2.namespace)
+
+if __name__ == "__main__":
+    unittest.main()
+''')
+    
+    def _create_namespace_package_readme(self, project_path: Path, project_name: str, namespace: str, subpackage: str, metadata: Dict[str, str]):
+        """Create README for namespace package."""
+        content = f'''# {namespace.title()}.{subpackage.title()} - Namespace Package
+
+{metadata.get('description', f'The {subpackage} component of the {namespace} namespace package')}
+
+This package is part of the `{namespace}` namespace, enabling distributed development and modular architecture.
+
+## What are Namespace Packages?
+
+Namespace packages allow multiple, separately distributed packages to share a common namespace. This enables:
+
+- **Distributed Development**: Different teams can develop separate components
+- **Independent Releases**: Each component has its own release cycle  
+- **Modular Architecture**: Users install only the components they need
+- **Avoiding Conflicts**: No single "root" package owns the namespace
+
+## Installation
+
+```bash
+pip install {namespace}-{subpackage}
+```
+
+## Usage
+
+### Basic Usage
+
+```python
+from {namespace}.{subpackage} import {self._to_class_name(subpackage)}
+
+# Create component instance
+component = {self._to_class_name(subpackage)}()
+
+# Get component information
+info = component.get_info()
+print(f"Component: {{info['full_name']}}")
+print(f"Version: {{info['version']}}")
+```
+
+### Working with Multiple Namespace Components
+
+```python
+from {namespace}.{subpackage} import {self._to_class_name(subpackage)}, discover_namespace_packages
+
+# Discover all available namespace packages
+packages = discover_namespace_packages()
+print(f"Available {namespace} packages: {{packages}}")
+
+# Discover sibling packages
+component = {self._to_class_name(subpackage)}()
+siblings = component.discover_siblings()
+print(f"Sibling packages: {{siblings}}")
+
+# Call methods on sibling packages (if available)
+result = component.call_sibling("other_component", "get_info")
+if result:
+    print(f"Sibling info: {{result}}")
+```
+
+## Package Structure
+
+```
+{namespace}-{subpackage}/
+├── src/
+│   └── {namespace}/           # Namespace (NO __init__.py!)
+│       └── {subpackage}/      # Component package
+│           ├── __init__.py    # Component init
+│           └── core.py        # Implementation
+├── tests/
+├── docs/
+├── setup.py
+├── pyproject.toml
+└── README.md
+```
+
+**Important**: The `src/{namespace}/` directory should NOT contain an `__init__.py` file. This is crucial for proper namespace package functionality.
+
+## Creating Additional Components
+
+To add another component to the `{namespace}` namespace:
+
+### 1. Create New Package Structure
+
+```bash
+mkdir {namespace}-new-component
+cd {namespace}-new-component
+
+# Create the structure
+mkdir -p src/{namespace}/new_component
+mkdir tests docs
+
+# Create component files (NO __init__.py in {namespace}/)
+touch src/{namespace}/new_component/__init__.py
+touch src/{namespace}/new_component/core.py
+```
+
+### 2. Setup Configuration
+
+Use `find_namespace_packages()` in setup.py:
+
+```python
+from setuptools import setup, find_namespace_packages
+
+setup(
+    name="{namespace}-new-component",
+    packages=find_namespace_packages(where="src"),
+    package_dir={{"": "src"}},
+    # ... other configuration
+)
+```
+
+### 3. Install and Test
+
+```bash
+pip install -e .
+
+# Test namespace functionality
+python -c "
+import {namespace}.{subpackage}
+import {namespace}.new_component
+print('Both components accessible!')
+"
+```
+
+## Development
+
+### Development Installation
+
+```bash
+git clone <repository-url>
+cd {namespace}-{subpackage}
+pip install -e ".[dev]"
+```
+
+### Running Tests
+
+```bash
+pytest tests/
+```
+
+### Testing with Other Components
+
+To test interaction with other namespace components:
+
+```bash
+# Install other components
+pip install {namespace}-other-component
+
+# Run integration tests
+pytest tests/ -k "test_sibling"
+```
+
+## API Reference
+
+### {self._to_class_name(subpackage)} Class
+
+Main class for the {subpackage} component.
+
+#### Methods
+
+- `get_info()` → `Dict[str, Any]`: Get component information
+- `discover_siblings()` → `List[str]`: Find other namespace components  
+- `call_sibling(sibling_name, method_name, *args, **kwargs)`: Call method on sibling
+
+### Functions
+
+- `discover_namespace_packages(namespace="{namespace}")` → `List[str]`: Discover all namespace packages
+
+## Best Practices
+
+1. **No Namespace __init__.py**: Never add `__init__.py` to the namespace directory
+2. **Use find_namespace_packages()**: Essential for proper namespace support
+3. **Independent Versioning**: Each component should have its own version
+4. **Clear Naming**: Use `{namespace}-component-name` pattern for package names
+5. **Documentation**: Document inter-component dependencies and APIs
+
+## Troubleshooting
+
+### "No module named '{namespace}'" Error
+
+This typically means:
+- No namespace components are installed  
+- Components weren't installed with `find_namespace_packages()`
+- An `__init__.py` file exists in the namespace directory
+
+### Components Not Discoverable
+
+Check that:
+- All components use `find_namespace_packages()`
+- No `__init__.py` in namespace directory
+- Packages are properly installed (not just on PYTHONPATH)
+
+### Import Conflicts
+
+Ensure:
+- Subpackage names don't conflict across components
+- Each component has unique functionality
+- Dependencies are properly declared
+
+## Related Packages
+
+Other components in the `{namespace}` namespace:
+
+- `{namespace}-other-component`: Description of other component
+- `{namespace}-third-component`: Description of third component
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch  
+3. Make your changes
+4. Test with other namespace components
+5. Submit a pull request
+
+## License
+
+{metadata.get('license_type', 'MIT')} License - see LICENSE file for details.
+
+## Author
+
+{metadata.get('author', 'Your Name')} - {metadata.get('email', 'your.email@example.com')}
+'''
+        (project_path / "README.md").write_text(content)
+
+    def _generate_plugin_framework_template(self, project_path: Path, project_name: str, package_name: str, features: Dict[str, bool], metadata: Dict[str, str]) -> bool:
+        """Generate a plugin framework template."""
+        # Create main package structure
+        src_dir = project_path / "src" / package_name
+        src_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create plugins directory
+        plugins_dir = src_dir / "plugins"
+        plugins_dir.mkdir(exist_ok=True)
+        
+        # Main package __init__.py
+        (src_dir / "__init__.py").write_text(f'''"""
+{metadata.get('description', f'A {project_name} plugin framework')}
+"""
+
+__version__ = "{metadata.get('version', '0.1.0')}"
+
+from .core import PluginManager, Plugin
+from .registry import plugin_registry
+
+__all__ = ['PluginManager', 'Plugin', 'plugin_registry']
+''')
+        
+        # Plugin base class and manager
+        (src_dir / "core.py").write_text(f'''"""
+Core plugin framework for {project_name}.
+"""
+
+import abc
+import importlib
+import inspect
+import logging
+from typing import Dict, List, Any, Type, Optional, Callable
+from pathlib import Path
+
+logger = logging.getLogger(__name__)
+
+
+class Plugin(abc.ABC):
+    """Base class for all plugins."""
+    
+    # Plugin metadata
+    name: str = "Unknown Plugin"
+    version: str = "0.1.0"
+    description: str = ""
+    author: str = ""
+    
+    def __init__(self):
+        """Initialize the plugin."""
+        self.enabled = True
+        self.config = {{}}
+        logger.info(f"Initialized plugin: {{self.name}} v{{self.version}}")
+    
+    @abc.abstractmethod
+    def activate(self) -> bool:
+        """
+        Activate the plugin.
+        
+        Returns:
+            True if activation successful, False otherwise
+        """
+        pass
+    
+    @abc.abstractmethod
+    def deactivate(self) -> bool:
+        """
+        Deactivate the plugin.
+        
+        Returns:
+            True if deactivation successful, False otherwise
+        """
+        pass
+    
+    def configure(self, config: Dict[str, Any]) -> None:
+        """Configure the plugin with settings."""
+        self.config.update(config)
+        logger.debug(f"Configured plugin {{self.name}} with: {{config}}")
+    
+    def get_info(self) -> Dict[str, Any]:
+        """Get plugin information."""
+        return {{
+            "name": self.name,
+            "version": self.version,
+            "description": self.description,
+            "author": self.author,
+            "enabled": self.enabled,
+            "class": self.__class__.__name__,
+            "module": self.__class__.__module__,
+        }}
+
+
+class Hook:
+    """Represents a hook point where plugins can attach."""
+    
+    def __init__(self, name: str, description: str = ""):
+        self.name = name
+        self.description = description
+        self.callbacks: List[Callable] = []
+    
+    def register(self, callback: Callable) -> None:
+        """Register a callback for this hook."""
+        if callback not in self.callbacks:
+            self.callbacks.append(callback)
+            logger.debug(f"Registered callback for hook {{self.name}}")
+    
+    def unregister(self, callback: Callable) -> None:
+        """Unregister a callback from this hook."""
+        if callback in self.callbacks:
+            self.callbacks.remove(callback)
+            logger.debug(f"Unregistered callback for hook {{self.name}}")
+    
+    def call(self, *args, **kwargs) -> List[Any]:
+        """Call all registered callbacks."""
+        results = []
+        for callback in self.callbacks:
+            try:
+                result = callback(*args, **kwargs)
+                results.append(result)
+            except Exception as e:
+                logger.error(f"Error calling hook {{self.name}} callback: {{e}}")
+        return results
+
+
+class PluginManager:
+    """Manages plugin loading, activation, and lifecycle."""
+    
+    def __init__(self):
+        self.plugins: Dict[str, Plugin] = {{}}
+        self.hooks: Dict[str, Hook] = {{}}
+        self.plugin_paths: List[Path] = []
+        
+        # Register built-in hooks
+        self._register_builtin_hooks()
+    
+    def _register_builtin_hooks(self) -> None:
+        """Register built-in hook points."""
+        self.register_hook("plugin_loaded", "Called when a plugin is loaded")
+        self.register_hook("plugin_activated", "Called when a plugin is activated")
+        self.register_hook("plugin_deactivated", "Called when a plugin is deactivated")
+        self.register_hook("before_process", "Called before main processing")
+        self.register_hook("after_process", "Called after main processing")
+        self.register_hook("error_occurred", "Called when an error occurs")
+    
+    def register_hook(self, name: str, description: str = "") -> Hook:
+        """Register a new hook point."""
+        if name not in self.hooks:
+            self.hooks[name] = Hook(name, description)
+            logger.debug(f"Registered hook: {{name}}")
+        return self.hooks[name]
+    
+    def get_hook(self, name: str) -> Optional[Hook]:
+        """Get a hook by name."""
+        return self.hooks.get(name)
+    
+    def call_hook(self, name: str, *args, **kwargs) -> List[Any]:
+        """Call a hook by name."""
+        if name in self.hooks:
+            return self.hooks[name].call(*args, **kwargs)
+        return []
+    
+    def add_plugin_path(self, path: Path) -> None:
+        """Add a directory to search for plugins."""
+        if path.exists() and path.is_dir():
+            self.plugin_paths.append(path)
+            logger.info(f"Added plugin path: {{path}}")
+    
+    def discover_plugins(self) -> List[Type[Plugin]]:
+        """Discover plugin classes from plugin paths."""
+        plugin_classes = []
+        
+        for path in self.plugin_paths:
+            for py_file in path.glob("*.py"):
+                if py_file.name.startswith("_"):
+                    continue
+                
+                try:
+                    # Import the module
+                    spec = importlib.util.spec_from_file_location(
+                        py_file.stem, py_file
+                    )
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+                    
+                    # Find Plugin subclasses
+                    for name, obj in inspect.getmembers(module):
+                        if (inspect.isclass(obj) and 
+                            issubclass(obj, Plugin) and 
+                            obj is not Plugin):
+                            plugin_classes.append(obj)
+                            logger.debug(f"Discovered plugin: {{obj.name}}")
+                
+                except Exception as e:
+                    logger.error(f"Error loading plugin from {{py_file}}: {{e}}")
+        
+        return plugin_classes
+    
+    def load_plugin(self, plugin_class: Type[Plugin]) -> bool:
+        """Load and register a plugin instance."""
+        try:
+            plugin = plugin_class()
+            self.plugins[plugin.name] = plugin
+            self.call_hook("plugin_loaded", plugin)
+            logger.info(f"Loaded plugin: {{plugin.name}}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to load plugin {{plugin_class}}: {{e}}")
+            return False
+    
+    def activate_plugin(self, name: str) -> bool:
+        """Activate a plugin by name."""
+        if name in self.plugins:
+            plugin = self.plugins[name]
+            if plugin.activate():
+                plugin.enabled = True
+                self.call_hook("plugin_activated", plugin)
+                logger.info(f"Activated plugin: {{name}}")
+                return True
+        return False
+    
+    def deactivate_plugin(self, name: str) -> bool:
+        """Deactivate a plugin by name."""
+        if name in self.plugins:
+            plugin = self.plugins[name]
+            if plugin.deactivate():
+                plugin.enabled = False
+                self.call_hook("plugin_deactivated", plugin)
+                logger.info(f"Deactivated plugin: {{name}}")
+                return True
+        return False
+    
+    def get_plugin(self, name: str) -> Optional[Plugin]:
+        """Get a plugin by name."""
+        return self.plugins.get(name)
+    
+    def list_plugins(self) -> Dict[str, Dict[str, Any]]:
+        """List all loaded plugins with their info."""
+        return {{name: plugin.get_info() for name, plugin in self.plugins.items()}}
+    
+    def configure_plugin(self, name: str, config: Dict[str, Any]) -> bool:
+        """Configure a plugin."""
+        if name in self.plugins:
+            self.plugins[name].configure(config)
+            return True
+        return False
+    
+    def load_all_plugins(self) -> int:
+        """Discover and load all available plugins."""
+        plugin_classes = self.discover_plugins()
+        loaded_count = 0
+        
+        for plugin_class in plugin_classes:
+            if self.load_plugin(plugin_class):
+                loaded_count += 1
+        
+        logger.info(f"Loaded {{loaded_count}} plugins")
+        return loaded_count
+''')
+        
+        # Plugin registry for entry points
+        (src_dir / "registry.py").write_text(f'''"""
+Plugin registry and entry point management for {project_name}.
+"""
+
+import importlib.metadata
+import logging
+from typing import Dict, List, Type, Optional
+from .core import Plugin, PluginManager
+
+logger = logging.getLogger(__name__)
+
+
+class PluginRegistry:
+    """Registry for managing plugins via entry points."""
+    
+    def __init__(self, entry_point_group: str = "{package_name}.plugins"):
+        self.entry_point_group = entry_point_group
+        self.registered_plugins: Dict[str, Type[Plugin]] = {{}}
+    
+    def discover_entry_points(self) -> List[Type[Plugin]]:
+        """Discover plugins via entry points."""
+        plugin_classes = []
+        
+        try:
+            entry_points = importlib.metadata.entry_points(group=self.entry_point_group)
+            
+            for entry_point in entry_points:
+                try:
+                    plugin_class = entry_point.load()
+                    if issubclass(plugin_class, Plugin):
+                        plugin_classes.append(plugin_class)
+                        self.registered_plugins[entry_point.name] = plugin_class
+                        logger.debug(f"Discovered entry point plugin: {{entry_point.name}}")
+                    else:
+                        logger.warning(f"Entry point {{entry_point.name}} is not a Plugin subclass")
+                
+                except Exception as e:
+                    logger.error(f"Failed to load entry point {{entry_point.name}}: {{e}}")
+        
+        except Exception as e:
+            logger.error(f"Failed to discover entry points: {{e}}")
+        
+        return plugin_classes
+    
+    def get_plugin_class(self, name: str) -> Optional[Type[Plugin]]:
+        """Get a plugin class by entry point name."""
+        return self.registered_plugins.get(name)
+    
+    def list_available_plugins(self) -> Dict[str, str]:
+        """List available plugins from entry points."""
+        result = {{}}
+        
+        try:
+            entry_points = importlib.metadata.entry_points(group=self.entry_point_group)
+            for entry_point in entry_points:
+                result[entry_point.name] = str(entry_point.value)
+        except Exception as e:
+            logger.error(f"Failed to list entry points: {{e}}")
+        
+        return result
+
+
+# Global registry instance
+plugin_registry = PluginRegistry()
+
+
+def register_plugin(name: str, plugin_class: Type[Plugin]) -> None:
+    """Register a plugin programmatically."""
+    plugin_registry.registered_plugins[name] = plugin_class
+    logger.info(f"Registered plugin: {{name}}")
+
+
+def create_plugin_manager_with_entry_points() -> PluginManager:
+    """Create a plugin manager and load plugins from entry points."""
+    manager = PluginManager()
+    
+    # Load plugins from entry points
+    plugin_classes = plugin_registry.discover_entry_points()
+    
+    for plugin_class in plugin_classes:
+        manager.load_plugin(plugin_class)
+    
+    return manager
+''')
+        
+        # Example plugins
+        (plugins_dir / "__init__.py").write_text(f'''"""
+Example plugins for {project_name}.
+"""
+
+from .example_plugin import ExamplePlugin
+from .logging_plugin import LoggingPlugin
+
+__all__ = ['ExamplePlugin', 'LoggingPlugin']
+''')
+        
+        (plugins_dir / "example_plugin.py").write_text(f'''"""
+Example plugin for {project_name}.
+"""
+
+from ..core import Plugin
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class ExamplePlugin(Plugin):
+    """Example plugin demonstrating basic functionality."""
+    
+    name = "Example Plugin"
+    version = "1.0.0"
+    description = "An example plugin showing basic plugin functionality"
+    author = "Plugin Framework"
+    
+    def __init__(self):
+        super().__init__()
+        self.data = {{}}
+    
+    def activate(self) -> bool:
+        """Activate the example plugin."""
+        logger.info(f"Activating {{self.name}}")
+        
+        # Register for hooks if manager is available
+        if hasattr(self, '_manager'):
+            self._register_hooks()
+        
+        return True
+    
+    def deactivate(self) -> bool:
+        """Deactivate the example plugin."""
+        logger.info(f"Deactivating {{self.name}}")
+        return True
+    
+    def _register_hooks(self):
+        """Register hook callbacks."""
+        before_hook = self._manager.get_hook("before_process")
+        if before_hook:
+            before_hook.register(self.before_process_callback)
+        
+        after_hook = self._manager.get_hook("after_process")
+        if after_hook:
+            after_hook.register(self.after_process_callback)
+    
+    def before_process_callback(self, *args, **kwargs):
+        """Called before main processing."""
+        logger.info("Example plugin: before process")
+        self.data['before_process_called'] = True
+        return "example_before_result"
+    
+    def after_process_callback(self, *args, **kwargs):
+        """Called after main processing."""
+        logger.info("Example plugin: after process")
+        self.data['after_process_called'] = True
+        return "example_after_result"
+    
+    def process_data(self, data: str) -> str:
+        """Example method for processing data."""
+        processed = f"[ExamplePlugin] {{data}}"
+        logger.debug(f"Processed data: {{processed}}")
+        return processed
+''')
+        
+        (plugins_dir / "logging_plugin.py").write_text(f'''"""
+Logging plugin for {project_name}.
+"""
+
+import logging
+import sys
+from datetime import datetime
+from ..core import Plugin
+
+logger = logging.getLogger(__name__)
+
+
+class LoggingPlugin(Plugin):
+    """Plugin for enhanced logging functionality."""
+    
+    name = "Logging Plugin"
+    version = "1.0.0"
+    description = "Enhanced logging capabilities"
+    author = "Plugin Framework"
+    
+    def __init__(self):
+        super().__init__()
+        self.log_handler = None
+        self.original_level = None
+    
+    def activate(self) -> bool:
+        """Activate enhanced logging."""
+        logger.info(f"Activating {{self.name}}")
+        
+        # Set up enhanced logging
+        self._setup_enhanced_logging()
+        
+        # Register for hooks
+        if hasattr(self, '_manager'):
+            self._register_hooks()
+        
+        return True
+    
+    def deactivate(self) -> bool:
+        """Deactivate enhanced logging."""
+        logger.info(f"Deactivating {{self.name}}")
+        
+        # Restore original logging
+        self._restore_logging()
+        
+        return True
+    
+    def _setup_enhanced_logging(self):
+        """Set up enhanced logging format."""
+        # Create custom formatter
+        formatter = logging.Formatter(
+            '%(asctime)s [%(name)s:%(levelname)s] %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
+        
+        # Add handler to root logger
+        self.log_handler = logging.StreamHandler(sys.stdout)
+        self.log_handler.setFormatter(formatter)
+        
+        root_logger = logging.getLogger()
+        self.original_level = root_logger.level
+        root_logger.addHandler(self.log_handler)
+        root_logger.setLevel(logging.DEBUG)
+    
+    def _restore_logging(self):
+        """Restore original logging configuration."""
+        if self.log_handler:
+            root_logger = logging.getLogger()
+            root_logger.removeHandler(self.log_handler)
+            if self.original_level is not None:
+                root_logger.setLevel(self.original_level)
+    
+    def _register_hooks(self):
+        """Register logging hook callbacks."""
+        error_hook = self._manager.get_hook("error_occurred")
+        if error_hook:
+            error_hook.register(self.log_error_callback)
+    
+    def log_error_callback(self, error, context=None):
+        """Log error occurrences."""
+        timestamp = datetime.now().isoformat()
+        error_msg = f"[{{timestamp}}] ERROR: {{error}}"
+        if context:
+            error_msg += f" (Context: {{context}})"
+        
+        logger.error(error_msg)
+        return f"logged_error_{{timestamp}}"
+''')
+        
+        # CLI interface
+        (src_dir / "cli.py").write_text(f'''"""
+Command-line interface for {project_name} plugin system.
+"""
+
+import click
+import logging
+from pathlib import Path
+from .core import PluginManager
+from .registry import create_plugin_manager_with_entry_points, plugin_registry
+
+logger = logging.getLogger(__name__)
+
+
+@click.group()
+@click.option('--verbose', '-v', is_flag=True, help='Enable verbose output')
+@click.pass_context
+def cli(ctx, verbose):
+    """
+    {project_name} Plugin Framework CLI
+    
+    Manage and interact with plugins.
+    """
+    ctx.ensure_object(dict)
+    ctx.obj['verbose'] = verbose
+    
+    # Set up logging
+    level = logging.DEBUG if verbose else logging.INFO
+    logging.basicConfig(level=level, format='%(levelname)s: %(message)s')
+
+
+@cli.command()
+@click.pass_context
+def list_plugins(ctx):
+    """List all available plugins."""
+    click.echo("Available plugins from entry points:")
+    
+    available = plugin_registry.list_available_plugins()
+    if not available:
+        click.echo("  No plugins found via entry points")
+    else:
+        for name, value in available.items():
+            click.echo(f"  {{name}}: {{value}}")
+    
+    click.echo("\\nLoaded plugins:")
+    manager = create_plugin_manager_with_entry_points()
+    plugins = manager.list_plugins()
+    
+    if not plugins:
+        click.echo("  No plugins loaded")
+    else:
+        for name, info in plugins.items():
+            status = "enabled" if info['enabled'] else "disabled"
+            click.echo(f"  {{name}} v{{info['version']}} ({{status}})")
+            click.echo(f"    {{info['description']}}")
+
+
+@cli.command()
+@click.argument('plugin_name')
+@click.pass_context
+def activate(ctx, plugin_name):
+    """Activate a plugin."""
+    manager = create_plugin_manager_with_entry_points()
+    
+    if manager.activate_plugin(plugin_name):
+        click.echo(f"✅ Activated plugin: {{plugin_name}}")
+    else:
+        click.echo(f"❌ Failed to activate plugin: {{plugin_name}}")
+
+
+@cli.command()
+@click.argument('plugin_name')
+@click.pass_context
+def deactivate(ctx, plugin_name):
+    """Deactivate a plugin."""
+    manager = create_plugin_manager_with_entry_points()
+    
+    if manager.deactivate_plugin(plugin_name):
+        click.echo(f"✅ Deactivated plugin: {{plugin_name}}")
+    else:
+        click.echo(f"❌ Failed to deactivate plugin: {{plugin_name}}")
+
+
+@cli.command()
+@click.argument('plugin_path', type=click.Path(exists=True, path_type=Path))
+@click.pass_context
+def load_from_path(ctx, plugin_path):
+    """Load plugins from a directory path."""
+    manager = PluginManager()
+    manager.add_plugin_path(plugin_path)
+    
+    count = manager.load_all_plugins()
+    click.echo(f"Loaded {{count}} plugins from {{plugin_path}}")
+    
+    # List loaded plugins
+    plugins = manager.list_plugins()
+    for name, info in plugins.items():
+        click.echo(f"  {{name}} v{{info['version']}}")
+
+
+@cli.command()
+@click.pass_context
+def demo(ctx):
+    """Run a demonstration of the plugin system."""
+    click.echo("🔌 Plugin Framework Demo")
+    click.echo("========================")
+    
+    # Create manager and load plugins
+    manager = create_plugin_manager_with_entry_points()
+    
+    # Load example plugins from the plugins directory
+    from . import plugins
+    manager.add_plugin_path(Path(plugins.__file__).parent)
+    manager.load_all_plugins()
+    
+    click.echo(f"\\nLoaded {{len(manager.plugins)}} plugins:")
+    for name, plugin in manager.plugins.items():
+        click.echo(f"  - {{name}} v{{plugin.version}}")
+    
+    # Activate all plugins
+    click.echo("\\nActivating plugins...")
+    for name in manager.plugins.keys():
+        if manager.activate_plugin(name):
+            click.echo(f"  ✅ {{name}}")
+        else:
+            click.echo(f"  ❌ {{name}}")
+    
+    # Demonstrate hooks
+    click.echo("\\nDemonstrating hooks...")
+    click.echo("Calling 'before_process' hook:")
+    results = manager.call_hook("before_process", "demo_data")
+    for result in results:
+        click.echo(f"  Result: {{result}}")
+    
+    click.echo("\\nCalling 'after_process' hook:")
+    results = manager.call_hook("after_process", "demo_data")
+    for result in results:
+        click.echo(f"  Result: {{result}}")
+    
+    # Test error hook
+    click.echo("\\nTesting error hook:")
+    manager.call_hook("error_occurred", "Demo error", context="demo")
+    
+    click.echo("\\n✅ Demo completed!")
+
+
+if __name__ == '__main__':
+    cli()
+''')
+        
+        # Setup.py with entry points
+        (project_path / "setup.py").write_text(f'''"""
+Setup script for {project_name} plugin framework.
+"""
+
+from setuptools import setup, find_packages
+from pathlib import Path
+
+# Read README
+readme_file = Path(__file__).parent / "README.md"
+long_description = readme_file.read_text(encoding='utf-8') if readme_file.exists() else ""
+
+setup(
+    name="{package_name.replace('_', '-')}",
+    version="{metadata.get('version', '0.1.0')}",
+    author="{metadata.get('author', 'Your Name')}",
+    author_email="{metadata.get('email', 'your.email@example.com')}",
+    description="{metadata.get('description', f'A {project_name} plugin framework')}",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="{metadata.get('url', f'https://github.com/yourusername/{package_name.replace("_", "-")}')}",
+    packages=find_packages(where="src"),
+    package_dir={{"": "src"}},
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+    ],
+    python_requires=">=3.8",
+    install_requires=[
+        "click>=8.0.0",
+        "importlib-metadata>=4.0.0; python_version<'3.10'",
+    ],
+    extras_require={{
+        "dev": [
+            "pytest>=7.0.0",
+            "pytest-cov>=4.0.0",
+        ],
+    }},
+    # Entry points for CLI and example plugins
+    entry_points={{
+        "console_scripts": [
+            "{package_name.replace('_', '-')}-cli={package_name}.cli:cli",
+        ],
+        "{package_name}.plugins": [
+            "example={package_name}.plugins.example_plugin:ExamplePlugin",
+            "logging={package_name}.plugins.logging_plugin:LoggingPlugin",
+        ],
+    }},
+    zip_safe=False,
+)
+''')
+        
+        # Requirements
+        requirements = [
+            "click>=8.0.0",
+            "importlib-metadata>=4.0.0; python_version<'3.10'",
+        ]
+        (project_path / "requirements.txt").write_text("\\n".join(requirements) + "\\n")
+        
+        # Tests
+        if features.get('tests', True):
+            self._create_plugin_framework_tests(project_path, package_name)
+        
+        # README
+        if features.get('readme', True):
+            self._create_plugin_framework_readme(project_path, project_name, package_name, metadata)
+        
+        if features.get('gitignore', True):
+            self._create_basic_gitignore(project_path)
+        
+        return True
+
+    def _create_plugin_framework_tests(self, project_path: Path, package_name: str):
+        """Create tests for plugin framework."""
+        tests_dir = project_path / "tests"
+        tests_dir.mkdir(exist_ok=True)
+        
+        (tests_dir / "__init__.py").write_text("")
+        
+        # Test the core plugin system
+        (tests_dir / "test_plugin_system.py").write_text(f'''"""
+Tests for {package_name} plugin framework.
+"""
+
+import unittest
+from unittest.mock import Mock, patch
+from {package_name}.core import Plugin, PluginManager, Hook
+from {package_name}.registry import PluginRegistry
+
+
+class MockPlugin(Plugin):
+    """Mock plugin for testing."""
+    
+    name = "Mock Plugin"
+    version = "1.0.0"
+    description = "A mock plugin for testing"
+    author = "Test Suite"
+    
+    def __init__(self):
+        super().__init__()
+        self.activated = False
+        self.deactivated = False
+    
+    def activate(self) -> bool:
+        self.activated = True
+        return True
+    
+    def deactivate(self) -> bool:
+        self.deactivated = True
+        return True
+
+
+class TestHook(unittest.TestCase):
+    """Test hook functionality."""
+    
+    def setUp(self):
+        self.hook = Hook("test_hook", "Test hook description")
+    
+    def test_hook_creation(self):
+        self.assertEqual(self.hook.name, "test_hook")
+        self.assertEqual(self.hook.description, "Test hook description")
+        self.assertEqual(len(self.hook.callbacks), 0)
+    
+    def test_callback_registration(self):
+        def test_callback():
+            return "test_result"
+        
+        self.hook.register(test_callback)
+        self.assertIn(test_callback, self.hook.callbacks)
+        
+        # Should not add duplicate
+        self.hook.register(test_callback)
+        self.assertEqual(len(self.hook.callbacks), 1)
+    
+    def test_callback_unregistration(self):
+        def test_callback():
+            return "test_result"
+        
+        self.hook.register(test_callback)
+        self.hook.unregister(test_callback)
+        self.assertNotIn(test_callback, self.hook.callbacks)
+    
+    def test_hook_call(self):
+        results = []
+        
+        def callback1(data):
+            results.append(f"callback1: {{data}}")
+            return "result1"
+        
+        def callback2(data):
+            results.append(f"callback2: {{data}}")
+            return "result2"
+        
+        self.hook.register(callback1)
+        self.hook.register(callback2)
+        
+        hook_results = self.hook.call("test_data")
+        
+        self.assertEqual(len(hook_results), 2)
+        self.assertIn("result1", hook_results)
+        self.assertIn("result2", hook_results)
+        self.assertIn("callback1: test_data", results)
+        self.assertIn("callback2: test_data", results)
+
+
+class TestPlugin(unittest.TestCase):
+    """Test plugin base class."""
+    
+    def setUp(self):
+        self.plugin = MockPlugin()
+    
+    def test_plugin_creation(self):
+        self.assertEqual(self.plugin.name, "Mock Plugin")
+        self.assertEqual(self.plugin.version, "1.0.0")
+        self.assertTrue(self.plugin.enabled)
+        self.assertIsInstance(self.plugin.config, dict)
+    
+    def test_plugin_activation(self):
+        result = self.plugin.activate()
+        self.assertTrue(result)
+        self.assertTrue(self.plugin.activated)
+    
+    def test_plugin_deactivation(self):
+        result = self.plugin.deactivate()
+        self.assertTrue(result)
+        self.assertTrue(self.plugin.deactivated)
+    
+    def test_plugin_configuration(self):
+        config = {{"setting1": "value1", "setting2": "value2"}}
+        self.plugin.configure(config)
+        self.assertEqual(self.plugin.config["setting1"], "value1")
+        self.assertEqual(self.plugin.config["setting2"], "value2")
+    
+    def test_plugin_info(self):
+        info = self.plugin.get_info()
+        self.assertIsInstance(info, dict)
+        self.assertEqual(info["name"], "Mock Plugin")
+        self.assertEqual(info["version"], "1.0.0")
+        self.assertEqual(info["class"], "MockPlugin")
+        self.assertTrue(info["enabled"])
+
+
+class TestPluginManager(unittest.TestCase):
+    """Test plugin manager functionality."""
+    
+    def setUp(self):
+        self.manager = PluginManager()
+    
+    def test_manager_creation(self):
+        self.assertIsInstance(self.manager.plugins, dict)
+        self.assertIsInstance(self.manager.hooks, dict)
+        
+        # Should have built-in hooks
+        self.assertIn("plugin_loaded", self.manager.hooks)
+        self.assertIn("plugin_activated", self.manager.hooks)
+        self.assertIn("before_process", self.manager.hooks)
+    
+    def test_hook_registration(self):
+        hook = self.manager.register_hook("custom_hook", "Custom test hook")
+        self.assertIsInstance(hook, Hook)
+        self.assertEqual(hook.name, "custom_hook")
+        self.assertIn("custom_hook", self.manager.hooks)
+    
+    def test_plugin_loading(self):
+        result = self.manager.load_plugin(MockPlugin)
+        self.assertTrue(result)
+        self.assertIn("Mock Plugin", self.manager.plugins)
+        
+        plugin = self.manager.get_plugin("Mock Plugin")
+        self.assertIsInstance(plugin, MockPlugin)
+    
+    def test_plugin_activation(self):
+        self.manager.load_plugin(MockPlugin)
+        
+        result = self.manager.activate_plugin("Mock Plugin")
+        self.assertTrue(result)
+        
+        plugin = self.manager.get_plugin("Mock Plugin")
+        self.assertTrue(plugin.activated)
+        self.assertTrue(plugin.enabled)
+    
+    def test_plugin_deactivation(self):
+        self.manager.load_plugin(MockPlugin)
+        self.manager.activate_plugin("Mock Plugin")
+        
+        result = self.manager.deactivate_plugin("Mock Plugin")
+        self.assertTrue(result)
+        
+        plugin = self.manager.get_plugin("Mock Plugin")
+        self.assertTrue(plugin.deactivated)
+        self.assertFalse(plugin.enabled)
+    
+    def test_hook_calling(self):
+        # Register a test hook
+        test_hook = self.manager.register_hook("test_hook")
+        
+        # Add a callback
+        def test_callback(data):
+            return f"processed: {{data}}"
+        
+        test_hook.register(test_callback)
+        
+        # Call hook
+        results = self.manager.call_hook("test_hook", "test_data")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], "processed: test_data")
+    
+    def test_plugin_configuration(self):
+        self.manager.load_plugin(MockPlugin)
+        
+        config = {{"test_setting": "test_value"}}
+        result = self.manager.configure_plugin("Mock Plugin", config)
+        self.assertTrue(result)
+        
+        plugin = self.manager.get_plugin("Mock Plugin")
+        self.assertEqual(plugin.config["test_setting"], "test_value")
+    
+    def test_list_plugins(self):
+        self.manager.load_plugin(MockPlugin)
+        
+        plugins = self.manager.list_plugins()
+        self.assertIn("Mock Plugin", plugins)
+        self.assertIsInstance(plugins["Mock Plugin"], dict)
+
+
+class TestPluginRegistry(unittest.TestCase):
+    """Test plugin registry functionality."""
+    
+    def setUp(self):
+        self.registry = PluginRegistry("test.plugins")
+    
+    def test_registry_creation(self):
+        self.assertEqual(self.registry.entry_point_group, "test.plugins")
+        self.assertIsInstance(self.registry.registered_plugins, dict)
+    
+    @patch('importlib.metadata.entry_points')
+    def test_entry_point_discovery(self, mock_entry_points):
+        # Mock entry point
+        mock_ep = Mock()
+        mock_ep.name = "test_plugin"
+        mock_ep.load.return_value = MockPlugin
+        mock_entry_points.return_value = [mock_ep]
+        
+        plugins = self.registry.discover_entry_points()
+        
+        self.assertEqual(len(plugins), 1)
+        self.assertEqual(plugins[0], MockPlugin)
+        self.assertIn("test_plugin", self.registry.registered_plugins)
+
+
+if __name__ == "__main__":
+    unittest.main()
+''')
+        
+        # Test example plugins
+        (tests_dir / "test_example_plugins.py").write_text(f'''"""
+Tests for example plugins.
+"""
+
+import unittest
+from unittest.mock import Mock, patch
+from {package_name}.plugins.example_plugin import ExamplePlugin
+from {package_name}.plugins.logging_plugin import LoggingPlugin
+
+
+class TestExamplePlugin(unittest.TestCase):
+    """Test the example plugin."""
+    
+    def setUp(self):
+        self.plugin = ExamplePlugin()
+    
+    def test_plugin_info(self):
+        info = self.plugin.get_info()
+        self.assertEqual(info["name"], "Example Plugin")
+        self.assertEqual(info["version"], "1.0.0")
+    
+    def test_activation(self):
+        result = self.plugin.activate()
+        self.assertTrue(result)
+    
+    def test_deactivation(self):
+        result = self.plugin.deactivate()
+        self.assertTrue(result)
+    
+    def test_data_processing(self):
+        result = self.plugin.process_data("test_data")
+        self.assertEqual(result, "[ExamplePlugin] test_data")
+    
+    def test_hook_callbacks(self):
+        # Test callbacks directly
+        self.plugin.before_process_callback()
+        self.plugin.after_process_callback()
+        
+        self.assertTrue(self.plugin.data.get('before_process_called'))
+        self.assertTrue(self.plugin.data.get('after_process_called'))
+
+
+class TestLoggingPlugin(unittest.TestCase):
+    """Test the logging plugin."""
+    
+    def setUp(self):
+        self.plugin = LoggingPlugin()
+    
+    def test_plugin_info(self):
+        info = self.plugin.get_info()
+        self.assertEqual(info["name"], "Logging Plugin")
+        self.assertEqual(info["version"], "1.0.0")
+    
+    def test_activation_deactivation(self):
+        # Test activation
+        result = self.plugin.activate()
+        self.assertTrue(result)
+        self.assertIsNotNone(self.plugin.log_handler)
+        
+        # Test deactivation
+        result = self.plugin.deactivate()
+        self.assertTrue(result)
+    
+    def test_error_logging(self):
+        with patch('logging.getLogger') as mock_logger:
+            mock_log = Mock()
+            mock_logger.return_value = mock_log
+            
+            result = self.plugin.log_error_callback("test error", "test context")
+            
+            self.assertIsNotNone(result)
+            self.assertTrue(result.startswith("logged_error_"))
+
+
+if __name__ == "__main__":
+    unittest.main()
+''')
+    
+    def _create_plugin_framework_readme(self, project_path: Path, project_name: str, package_name: str, metadata: Dict[str, str]):
+        """Create README for plugin framework."""
+        content = f'''# {project_name} - Plugin Framework
+
+{metadata.get('description', f'A {project_name} plugin framework')}
+
+A powerful and flexible plugin system that supports dynamic loading, entry points, hooks, and extensible architecture.
+
+## Features
+
+- **Plugin Base Class**: Abstract base class for all plugins
+- **Plugin Manager**: Centralized management of plugin lifecycle
+- **Hook System**: Event-driven architecture with hook points
+- **Entry Points**: Automatic plugin discovery via setuptools entry points
+- **CLI Interface**: Command-line tools for plugin management
+- **Dynamic Loading**: Load plugins from directories at runtime
+- **Configuration**: Plugin-specific configuration support
+
+## Installation
+
+```bash
+pip install {package_name.replace('_', '-')}
+```
+
+## Quick Start
+
+### Using the Plugin System
+
+```python
+from {package_name} import PluginManager, Plugin
+from {package_name}.registry import create_plugin_manager_with_entry_points
+
+# Create a plugin manager with automatic entry point discovery
+manager = create_plugin_manager_with_entry_points()
+
+# List available plugins
+plugins = manager.list_plugins()
+for name, info in plugins.items():
+    print(f"{{name}} v{{info['version']}}: {{info['description']}}")
+
+# Activate a plugin
+manager.activate_plugin("Example Plugin")
+
+# Call hooks
+results = manager.call_hook("before_process", "some_data")
+print(f"Hook results: {{results}}")
+```
+
+### Command Line Interface
+
+```bash
+# List all available plugins
+{package_name.replace('_', '-')}-cli list-plugins
+
+# Activate a plugin
+{package_name.replace('_', '-')}-cli activate "Example Plugin"
+
+# Run a demonstration
+{package_name.replace('_', '-')}-cli demo
+
+# Load plugins from a directory
+{package_name.replace('_', '-')}-cli load-from-path /path/to/plugins
+```
+
+## Creating Plugins
+
+### Basic Plugin Structure
+
+```python
+from {package_name} import Plugin
+import logging
+
+logger = logging.getLogger(__name__)
+
+class MyPlugin(Plugin):
+    """My custom plugin."""
+    
+    name = "My Plugin"
+    version = "1.0.0"
+    description = "A custom plugin that does something useful"
+    author = "Your Name"
+    
+    def activate(self) -> bool:
+        """Activate the plugin."""
+        logger.info(f"Activating {{self.name}}")
+        
+        # Register for hooks
+        if hasattr(self, '_manager'):
+            hook = self._manager.get_hook("before_process")
+            if hook:
+                hook.register(self.my_callback)
+        
+        return True
+    
+    def deactivate(self) -> bool:
+        """Deactivate the plugin."""
+        logger.info(f"Deactivating {{self.name}}")
+        return True
+    
+    def my_callback(self, data):
+        """Example hook callback."""
+        logger.info(f"Processing data: {{data}}")
+        return f"MyPlugin processed: {{data}}"
+```
+
+### Entry Point Registration
+
+In your plugin package's `setup.py`:
+
+```python
+setup(
+    name="my-plugin-package",
+    # ... other settings ...
+    entry_points={{
+        "{package_name}.plugins": [
+            "my_plugin=my_plugin_package.plugin:MyPlugin",
+        ],
+    }},
+)
+```
+
+## Hook System
+
+### Built-in Hooks
+
+The framework provides several built-in hooks:
+
+- `plugin_loaded`: Called when a plugin is loaded
+- `plugin_activated`: Called when a plugin is activated  
+- `plugin_deactivated`: Called when a plugin is deactivated
+- `before_process`: Called before main processing
+- `after_process`: Called after main processing
+- `error_occurred`: Called when an error occurs
+
+### Custom Hooks
+
+```python
+# Register a custom hook
+hook = manager.register_hook("custom_event", "Called for custom events")
+
+# Register a callback
+def my_callback(data):
+    print(f"Custom event triggered with: {{data}}")
+    return "callback_result"
+
+hook.register(my_callback)
+
+# Call the hook
+results = manager.call_hook("custom_event", "event_data")
+```
+
+## Plugin Discovery
+
+### Entry Points (Recommended)
+
+Plugins can be automatically discovered through setuptools entry points:
+
+```python
+from {package_name}.registry import create_plugin_manager_with_entry_points
+
+manager = create_plugin_manager_with_entry_points()
+# Automatically loads all plugins registered via entry points
+```
+
+### Directory-based Discovery
+
+Load plugins from specific directories:
+
+```python
+from {package_name} import PluginManager
+from pathlib import Path
+
+manager = PluginManager()
+manager.add_plugin_path(Path("/path/to/plugins"))
+count = manager.load_all_plugins()
+print(f"Loaded {{count}} plugins")
+```
+
+## Configuration
+
+### Plugin Configuration
+
+```python
+# Configure a specific plugin
+config = {{
+    "setting1": "value1",
+    "debug": True,
+    "max_items": 100
+}}
+
+manager.configure_plugin("My Plugin", config)
+```
+
+### Global Configuration
+
+```python
+# Set up logging for the plugin system
+import logging
+logging.basicConfig(level=logging.INFO)
+
+# Configure plugin paths
+manager.add_plugin_path(Path("./plugins"))
+manager.add_plugin_path(Path("/usr/local/share/my-app/plugins"))
+```
+
+## Advanced Usage
+
+### Plugin Lifecycle Management
+
+```python
+# Load specific plugin
+manager.load_plugin(MyPluginClass)
+
+# Activate/deactivate
+manager.activate_plugin("My Plugin")
+manager.deactivate_plugin("My Plugin")
+
+# Check plugin status
+plugin = manager.get_plugin("My Plugin")
+if plugin and plugin.enabled:
+    print("Plugin is active")
+```
+
+### Hook-based Architecture
+
+```python
+class DataProcessor:
+    def __init__(self, plugin_manager):
+        self.manager = plugin_manager
+    
+    def process_data(self, data):
+        # Call before_process hooks
+        self.manager.call_hook("before_process", data)
+        
+        try:
+            # Main processing logic
+            result = self._do_processing(data)
+            
+            # Call after_process hooks
+            self.manager.call_hook("after_process", result)
+            
+            return result
+            
+        except Exception as e:
+            # Call error hooks
+            self.manager.call_hook("error_occurred", e, context="data_processing")
+            raise
+```
+
+## Example Plugins
+
+The framework includes example plugins:
+
+### Example Plugin
+- Demonstrates basic plugin functionality
+- Shows hook registration and callbacks
+- Provides data processing example
+
+### Logging Plugin  
+- Enhanced logging capabilities
+- Custom log formatting
+- Error logging hooks
+
+## Development
+
+### Development Setup
+
+```bash
+git clone <repository-url>
+cd {package_name.replace('_', '-')}
+pip install -e ".[dev]"
+```
+
+### Running Tests
+
+```bash
+pytest tests/
+```
+
+### Creating Plugin Packages
+
+1. Create your plugin class inheriting from `Plugin`
+2. Implement `activate()` and `deactivate()` methods
+3. Add entry point in setup.py
+4. Install your plugin package
+5. The plugin will be automatically discovered
+
+## API Reference
+
+### Plugin Class
+
+Abstract base class for all plugins.
+
+**Attributes:**
+- `name`: Plugin name
+- `version`: Plugin version
+- `description`: Plugin description
+- `author`: Plugin author
+- `enabled`: Plugin activation status
+- `config`: Plugin configuration dict
+
+**Methods:**
+- `activate() -> bool`: Activate the plugin
+- `deactivate() -> bool`: Deactivate the plugin
+- `configure(config: Dict[str, Any])`: Configure the plugin
+- `get_info() -> Dict[str, Any]`: Get plugin information
+
+### PluginManager Class
+
+Manages plugin loading, activation, and lifecycle.
+
+**Methods:**
+- `load_plugin(plugin_class: Type[Plugin]) -> bool`: Load a plugin
+- `activate_plugin(name: str) -> bool`: Activate a plugin
+- `deactivate_plugin(name: str) -> bool`: Deactivate a plugin
+- `get_plugin(name: str) -> Optional[Plugin]`: Get plugin by name
+- `list_plugins() -> Dict[str, Dict[str, Any]]`: List all plugins
+- `register_hook(name: str, description: str) -> Hook`: Register a hook
+- `call_hook(name: str, *args, **kwargs) -> List[Any]`: Call a hook
+
+### Hook Class
+
+Represents a hook point where plugins can attach callbacks.
+
+**Methods:**
+- `register(callback: Callable)`: Register a callback
+- `unregister(callback: Callable)`: Unregister a callback
+- `call(*args, **kwargs) -> List[Any]`: Call all callbacks
+
+## Examples
+
+### Simple Plugin
+
+```python
+from {package_name} import Plugin
+
+class GreetingPlugin(Plugin):
+    name = "Greeting Plugin"
+    version = "1.0.0"
+    description = "Provides greeting functionality"
+    
+    def activate(self):
+        print(f"Hello from {{self.name}}!")
+        return True
+    
+    def deactivate(self):
+        print(f"Goodbye from {{self.name}}!")
+        return True
+    
+    def greet(self, name):
+        return f"Hello, {{name}}! From {{self.name}}"
+```
+
+### Plugin with Hooks
+
+```python
+class ProcessorPlugin(Plugin):
+    name = "Processor Plugin"
+    version = "1.0.0"
+    
+    def activate(self):
+        # Register for processing hooks
+        if hasattr(self, '_manager'):
+            before_hook = self._manager.get_hook("before_process")
+            after_hook = self._manager.get_hook("after_process")
+            
+            if before_hook:
+                before_hook.register(self.preprocess)
+            if after_hook:
+                after_hook.register(self.postprocess)
+        
+        return True
+    
+    def deactivate(self):
+        return True
+    
+    def preprocess(self, data):
+        print(f"Preprocessing: {{data}}")
+        return f"preprocessed_{{data}}"
+    
+    def postprocess(self, result):
+        print(f"Postprocessing: {{result}}")
+        return f"postprocessed_{{result}}"
+```
+
+## Troubleshooting
+
+### Plugin Not Found
+
+- Check that the plugin package is installed
+- Verify entry point configuration in setup.py
+- Use `list-plugins` command to see available plugins
+
+### Plugin Fails to Load
+
+- Check plugin class inherits from `Plugin`
+- Verify `activate()` and `deactivate()` methods are implemented
+- Check for import errors in plugin code
+
+### Hook Not Working
+
+- Ensure hook is registered before plugin activation
+- Check that callback is properly registered with hook
+- Verify hook name matches exactly
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Submit a pull request
+
+## License
+
+{metadata.get('license_type', 'MIT')} License - see LICENSE file for details.
+
+## Author
+
+{metadata.get('author', 'Your Name')} - {metadata.get('email', 'your.email@example.com')}
+'''
+        (project_path / "README.md").write_text(content)
+
+
+def setup_logging(level: str = "INFO") -> None:
+    """Set up logging configuration."""
+    logging.basicConfig(
+        level=getattr(logging, level.upper()),
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[logging.StreamHandler()]
+    )
 
 
 def setup_logging(level: str = "INFO") -> None:

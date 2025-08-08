@@ -31,7 +31,7 @@ if WX_AVAILABLE:
             super().__init__(
                 None,
                 title=f"Python Project Generator v{__version__}",
-                size=(950, 750)
+                size=(1200, 800)
             )
             
             self.generator = ProjectGenerator()
@@ -102,7 +102,8 @@ if WX_AVAILABLE:
         
         def create_template_selection_panel(self):
             """Create the template selection panel."""
-            panel = wx.Panel(self.notebook)
+            panel = scrolled.ScrolledPanel(self.notebook)
+            panel.SetupScrolling()
             sizer = wx.BoxSizer(wx.VERTICAL)
             
             # Template selection
@@ -116,7 +117,7 @@ if WX_AVAILABLE:
             self.template_ids = []
             
             for template_id, template_info in templates.items():
-                choice_text = f"{template_info['name']} - {template_info['description']}"
+                choice_text = f"{template_info['name']}"
                 template_choices.append(choice_text)
                 self.template_ids.append(template_id)
             
@@ -124,18 +125,92 @@ if WX_AVAILABLE:
             self.template_choice.SetSelection(0)  # Default to first template
             self.template_choice.Bind(wx.EVT_CHOICE, self.on_template_changed)
             
-            # Template description
-            self.template_desc = wx.StaticText(panel, label="")
-            self.template_desc.Wrap(500)
+            # Create a horizontal layout for template info and structure
+            info_sizer = wx.BoxSizer(wx.HORIZONTAL)
             
-            # Update description for default selection
-            self.on_template_changed(None)
+            # Left side: Template description and info
+            left_panel = wx.Panel(panel)
+            left_sizer = wx.BoxSizer(wx.VERTICAL)
+            
+            # Template description
+            desc_label = wx.StaticText(left_panel, label="Description:")
+            desc_font = desc_label.GetFont()
+            desc_font.SetWeight(wx.FONTWEIGHT_BOLD)
+            desc_label.SetFont(desc_font)
+            
+            self.template_desc = wx.StaticText(left_panel, label="")
+            self.template_desc.Wrap(300)
+            
+            # Key features
+            features_label = wx.StaticText(left_panel, label="Key Features:")
+            features_font = features_label.GetFont()
+            features_font.SetWeight(wx.FONTWEIGHT_BOLD)
+            features_label.SetFont(features_font)
+            
+            self.template_features = wx.StaticText(left_panel, label="")
+            self.template_features.Wrap(300)
+            
+            # Use cases
+            cases_label = wx.StaticText(left_panel, label="Use Cases:")
+            cases_font = cases_label.GetFont()
+            cases_font.SetWeight(wx.FONTWEIGHT_BOLD)
+            cases_label.SetFont(cases_font)
+            
+            self.template_cases = wx.StaticText(left_panel, label="")
+            self.template_cases.Wrap(300)
+            
+            # Dependencies
+            deps_label = wx.StaticText(left_panel, label="Main Dependencies:")
+            deps_font = deps_label.GetFont()
+            deps_font.SetWeight(wx.FONTWEIGHT_BOLD)
+            deps_label.SetFont(deps_font)
+            
+            self.template_deps = wx.StaticText(left_panel, label="")
+            self.template_deps.Wrap(300)
+            
+            left_sizer.Add(desc_label, 0, wx.ALL, 5)
+            left_sizer.Add(self.template_desc, 0, wx.ALL, 5)
+            left_sizer.Add(features_label, 0, wx.ALL, 5)
+            left_sizer.Add(self.template_features, 0, wx.ALL, 5)
+            left_sizer.Add(cases_label, 0, wx.ALL, 5)
+            left_sizer.Add(self.template_cases, 0, wx.ALL, 5)
+            left_sizer.Add(deps_label, 0, wx.ALL, 5)
+            left_sizer.Add(self.template_deps, 0, wx.ALL, 5)
+            left_panel.SetSizer(left_sizer)
+            
+            # Right side: Project structure
+            right_panel = wx.Panel(panel)
+            right_sizer = wx.BoxSizer(wx.VERTICAL)
+            
+            structure_label = wx.StaticText(right_panel, label="Project Structure:")
+            structure_font = structure_label.GetFont()
+            structure_font.SetWeight(wx.FONTWEIGHT_BOLD)
+            structure_label.SetFont(structure_font)
+            
+            # Use a text control with monospace font for the structure
+            self.template_structure = wx.TextCtrl(
+                right_panel, 
+                style=wx.TE_MULTILINE | wx.TE_READONLY,
+                size=(400, 300)
+            )
+            structure_font = wx.Font(9, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+            self.template_structure.SetFont(structure_font)
+            
+            right_sizer.Add(structure_label, 0, wx.ALL, 5)
+            right_sizer.Add(self.template_structure, 1, wx.ALL | wx.EXPAND, 5)
+            right_panel.SetSizer(right_sizer)
+            
+            # Add both panels to horizontal sizer
+            info_sizer.Add(left_panel, 1, wx.ALL | wx.EXPAND, 5)
+            info_sizer.Add(right_panel, 1, wx.ALL | wx.EXPAND, 5)
+            
+            # Update info for default selection
+            self.update_template_info()
             
             # Layout
             sizer.Add(template_label, 0, wx.ALL, 10)
             sizer.Add(self.template_choice, 0, wx.ALL | wx.EXPAND, 10)
-            sizer.Add(wx.StaticText(panel, label="Description:"), 0, wx.ALL, 10)
-            sizer.Add(self.template_desc, 0, wx.ALL, 10)
+            sizer.Add(info_sizer, 1, wx.ALL | wx.EXPAND, 10)
             
             panel.SetSizer(sizer)
             return panel
@@ -356,19 +431,50 @@ if WX_AVAILABLE:
         
         def on_template_changed(self, event):
             """Handle template selection change."""
-            if hasattr(self, 'template_choice'):
+            self.update_template_info()
+        
+        def update_template_info(self):
+            """Update the template information display."""
+            if hasattr(self, 'template_choice') and hasattr(self, 'template_ids'):
                 selection = self.template_choice.GetSelection()
                 if selection >= 0 and selection < len(self.template_ids):
                     template_id = self.template_ids[selection]
-                    templates = self.template_manager.get_available_templates()
-                    template_info = templates.get(template_id, {})
                     
-                    description = template_info.get('description', 'No description available')
-                    features = template_info.get('features', [])
+                    # Get detailed template information
+                    detailed_info = self.template_manager.get_template_detailed_info(template_id)
                     
-                    desc_text = f"{description}\n\nDefault features: {', '.join(features)}"
-                    self.template_desc.SetLabel(desc_text)
-                    self.template_desc.Wrap(500)
+                    if "error" not in detailed_info:
+                        # Update description
+                        self.template_desc.SetLabel(detailed_info['description'])
+                        
+                        # Update key features
+                        features_text = "\n".join(f"• {feature}" for feature in detailed_info['key_features'])
+                        self.template_features.SetLabel(features_text)
+                        
+                        # Update use cases
+                        cases_text = "\n".join(f"• {case}" for case in detailed_info['use_cases'])
+                        self.template_cases.SetLabel(cases_text)
+                        
+                        # Update dependencies
+                        deps_text = ", ".join(detailed_info['dependencies'])
+                        self.template_deps.SetLabel(deps_text)
+                        
+                        # Update project structure
+                        structure_text = "\n".join(detailed_info['project_structure'])
+                        self.template_structure.SetValue(structure_text)
+                        
+                        # Update layout
+                        if hasattr(self, 'template_panel'):
+                            self.template_panel.Layout()
+                            self.template_panel.FitInside()
+                    else:
+                        # Handle error case
+                        self.template_desc.SetLabel("Template information not available")
+                        if hasattr(self, 'template_features'):
+                            self.template_features.SetLabel("")
+                            self.template_cases.SetLabel("")
+                            self.template_deps.SetLabel("")
+                            self.template_structure.SetValue("")
         
         def on_browse_output(self, event):
             """Handle browse output directory button."""
