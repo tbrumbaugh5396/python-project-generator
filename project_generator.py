@@ -33,14 +33,14 @@ class TemplateManager:
                 "description": "Complete Python project with CLI, GUI, testing, and packaging",
                 "source": "https://github.com/yourusername/python-skeleton-project.git",
                 "type": "git",
-                "features": ["cli", "gui", "tests", "executable", "pypi_packaging", "dev_requirements", "license", "readme", "makefile", "gitignore", "github_actions"]
+                "features": ["cli", "gui", "tests", "executable", "pypi_packaging", "dev_requirements", "license", "readme", "changelog", "contributors", "code_of_conduct", "security", "makefile", "gitignore", "github_actions"]
             },
             "minimal-python": {
                 "name": "Minimal Python Project",
                 "description": "Basic Python project structure",
                 "source": "local",
                 "type": "builtin",
-                "features": ["pypi_packaging", "tests", "license", "readme", "gitignore"]
+                "features": ["pypi_packaging", "tests", "license", "readme", "changelog", "gitignore"]
             },
             "flask-web-app": {
                 "name": "Flask Web Application",
@@ -89,7 +89,7 @@ class TemplateManager:
                 "description": "Professional Python library ready for PyPI publication",
                 "source": "local",
                 "type": "builtin",
-                "features": ["library_structure", "api_documentation", "comprehensive_tests", "pypi_packaging", "tox", "ci_cd", "license", "readme", "gitignore", "github_actions"]
+                "features": ["library_structure", "api_documentation", "comprehensive_tests", "pypi_packaging", "tox", "ci_cd", "license", "readme", "changelog", "contributors", "code_of_conduct", "security", "gitignore", "github_actions"]
             },
             "game-development": {
                 "name": "Game Development",
@@ -1113,6 +1113,545 @@ venv/
 '''
         (project_path / ".gitignore").write_text(content)
     
+    def _create_changelog(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create CHANGELOG.md file."""
+        content = f'''# Changelog
+
+All notable changes to {project_name} will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- Initial project setup
+- Basic project structure
+- {metadata.get('description', 'Core functionality')}
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [{metadata.get('version', '0.1.0')}] - {metadata.get('date', '2024-01-01')}
+
+### Added
+- Initial release
+- Project foundation and structure
+
+[Unreleased]: https://github.com/yourusername/{self._to_package_name(project_name)}/compare/v{metadata.get('version', '0.1.0')}...HEAD
+[{metadata.get('version', '0.1.0')}]: https://github.com/yourusername/{self._to_package_name(project_name)}/releases/tag/v{metadata.get('version', '0.1.0')}
+'''
+        (project_path / "CHANGELOG.md").write_text(content)
+    
+    def _create_contributors(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create CONTRIBUTORS.md file."""
+        content = f'''# Contributors
+
+Thank you to all the people who have contributed to {project_name}!
+
+## Core Team
+
+- **{metadata.get('author', 'Your Name')}** - *Initial work* - [{metadata.get('author', 'Your Name')}](https://github.com/yourusername)
+
+## Contributors
+
+<!-- Add contributors here -->
+
+## How to Contribute
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+### Ways to Contribute
+
+- 🐛 Report bugs
+- 💡 Suggest new features
+- 📝 Improve documentation
+- 🧪 Write tests
+- 💻 Submit code changes
+
+### Recognition
+
+All contributors will be recognized here. Thank you for making {project_name} better!
+
+## Code of Conduct
+
+This project and everyone participating in it is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). 
+By participating, you are expected to uphold this code.
+'''
+        (project_path / "CONTRIBUTORS.md").write_text(content)
+    
+    def _create_code_of_conduct(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create CODE_OF_CONDUCT.md file."""
+        content = f'''# Code of Conduct
+
+## Our Pledge
+
+We as members, contributors, and leaders pledge to make participation in {project_name}
+a harassment-free experience for everyone, regardless of age, body size, visible or 
+invisible disability, ethnicity, sex characteristics, gender identity and expression, 
+level of experience, education, socio-economic status, nationality, personal appearance, 
+race, religion, or sexual identity and orientation.
+
+## Our Standards
+
+Examples of behavior that contributes to creating a positive environment include:
+
+- Using welcoming and inclusive language
+- Being respectful of differing viewpoints and experiences
+- Gracefully accepting constructive criticism
+- Focusing on what is best for the community
+- Showing empathy towards other community members
+
+Examples of unacceptable behavior include:
+
+- The use of sexualized language or imagery and unwelcome sexual attention or advances
+- Trolling, insulting/derogatory comments, and personal or political attacks
+- Public or private harassment
+- Publishing others' private information without explicit permission
+- Other conduct which could reasonably be considered inappropriate in a professional setting
+
+## Our Responsibilities
+
+Project maintainers are responsible for clarifying the standards of acceptable behavior
+and are expected to take appropriate and fair corrective action in response to any
+instances of unacceptable behavior.
+
+## Scope
+
+This Code of Conduct applies both within project spaces and in public spaces when
+an individual is representing the project or its community.
+
+## Enforcement
+
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported
+by contacting the project team at {metadata.get('email', 'your.email@example.com')}.
+
+All complaints will be reviewed and investigated and will result in a response that
+is deemed necessary and appropriate to the circumstances.
+
+## Attribution
+
+This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org),
+version 2.0, available at https://www.contributor-covenant.org/version/2/0/code_of_conduct.html.
+'''
+        (project_path / "CODE_OF_CONDUCT.md").write_text(content)
+    
+    def _create_security(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create SECURITY.md file."""
+        content = f'''# Security Policy
+
+## Supported Versions
+
+Use this section to tell people about which versions of {project_name} are
+currently being supported with security updates.
+
+| Version | Supported          |
+| ------- | ------------------ |
+| {metadata.get('version', '0.1.0')}   | :white_check_mark: |
+
+## Reporting a Vulnerability
+
+We take the security of {project_name} seriously. If you believe you have found a security vulnerability,
+please report it to us as described below.
+
+### How to Report
+
+**Please do not report security vulnerabilities through public GitHub issues.**
+
+Instead, please report them by email to {metadata.get('email', 'security@example.com')}.
+
+Please include the following information in your report:
+
+- Type of issue (e.g. buffer overflow, SQL injection, cross-site scripting, etc.)
+- Full paths of source file(s) related to the manifestation of the issue
+- The location of the affected source code (tag/branch/commit or direct URL)
+- Any special configuration required to reproduce the issue
+- Step-by-step instructions to reproduce the issue
+- Proof-of-concept or exploit code (if possible)
+- Impact of the issue, including how an attacker might exploit the issue
+
+### What to Expect
+
+You should receive a response within 48 hours. If the issue is confirmed as a vulnerability,
+we will:
+
+1. Acknowledge your email within 48 hours
+2. Provide a more detailed response within 7 days indicating next steps
+3. Work on a fix and coordinate disclosure timeline
+4. Notify you when the vulnerability is fixed
+
+### Safe Harbor
+
+We support safe harbor for security researchers who:
+
+- Make a good faith effort to avoid privacy violations and disruptions to others
+- Only interact with accounts you own or with explicit permission of the account holder
+- Do not access or download data that doesn't belong to you
+- Do not intentionally harm or degrade our systems
+
+Thank you for helping keep {project_name} and our users safe!
+'''
+        (project_path / "SECURITY.md").write_text(content)
+
+    def _create_contributing(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create CONTRIBUTING.md file."""
+        content = f'''# Contributing to {project_name}
+
+First off, thank you for considering contributing to {project_name}! It's people like you that make this project great.
+
+## Table of Contents
+
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [How Can I Contribute?](#how-can-i-contribute)
+- [Style Guidelines](#style-guidelines)
+- [Development Setup](#development-setup)
+- [Pull Request Process](#pull-request-process)
+
+## Code of Conduct
+
+This project and everyone participating in it is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). 
+By participating, you are expected to uphold this code.
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.8 or higher
+- Git
+
+### Development Setup
+
+1. Fork the repository
+2. Clone your fork:
+   ```bash
+   git clone https://github.com/yourusername/{self._to_package_name(project_name)}.git
+   cd {self._to_package_name(project_name)}
+   ```
+
+3. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\\Scripts\\activate
+   ```
+
+4. Install development dependencies:
+   ```bash
+   pip install -e .[dev]
+   ```
+
+5. Run tests to make sure everything works:
+   ```bash
+   pytest
+   ```
+
+## How Can I Contribute?
+
+### Reporting Bugs
+
+Before creating bug reports, please check existing issues to avoid duplicates. When creating a bug report, include:
+
+- A clear and descriptive title
+- Steps to reproduce the behavior
+- Expected behavior
+- Actual behavior
+- Screenshots (if applicable)
+- Environment details (OS, Python version, etc.)
+
+### Suggesting Enhancements
+
+Enhancement suggestions are welcome! Please provide:
+
+- A clear and descriptive title
+- A detailed description of the proposed feature
+- Explain why this enhancement would be useful
+- Include examples if applicable
+
+### Code Contributions
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Commit your changes (`git commit -m 'Add amazing feature'`)
+7. Push to the branch (`git push origin feature/amazing-feature`)
+8. Open a Pull Request
+
+## Style Guidelines
+
+### Python Code Style
+
+- Follow [PEP 8](https://www.python.org/dev/peps/pep-0008/)
+- Use type hints where appropriate
+- Write docstrings for public functions and classes
+- Keep functions small and focused
+
+### Git Commit Messages
+
+- Use the present tense ("Add feature" not "Added feature")
+- Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
+- Limit the first line to 72 characters or less
+- Reference issues and pull requests liberally after the first line
+
+## Pull Request Process
+
+1. Ensure any install or build dependencies are removed before the end of the layer when doing a build
+2. Update the README.md with details of changes to the interface, if applicable
+3. Update the version numbers in any examples files and the README.md to the new version that this Pull Request would represent
+4. You may merge the Pull Request in once you have the sign-off of two other developers, or if you do not have permission to do that, you may request the second reviewer to merge it for you
+
+## Development Guidelines
+
+### Testing
+
+- Write tests for new functionality
+- Ensure existing tests still pass
+- Aim for good test coverage
+- Use descriptive test names
+
+### Documentation
+
+- Update documentation for any changed functionality
+- Include docstrings for new functions and classes
+- Update README if necessary
+
+## Questions?
+
+Don't hesitate to ask questions! You can reach out to the maintainers at {metadata.get('email', 'maintainers@example.com')}.
+
+Thank you for contributing! 🎉
+'''
+        (project_path / "CONTRIBUTING.md").write_text(content)
+
+    def _create_roadmap(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create ROADMAP.md file."""
+        content = f'''# {project_name} Roadmap
+
+This document outlines the planned development direction for {project_name}.
+
+## Current Version: {metadata.get('version', '0.1.0')}
+
+### Recently Completed ✅
+- Initial project setup
+- Core functionality implementation
+- Basic documentation
+
+## Upcoming Releases
+
+### Version 0.2.0 (Next Minor Release)
+**Target: Q2 2024**
+
+#### Features
+- [ ] Feature A
+- [ ] Feature B
+- [ ] Improved error handling
+
+#### Improvements
+- [ ] Performance optimizations
+- [ ] Better documentation
+- [ ] Additional tests
+
+### Version 0.3.0
+**Target: Q3 2024**
+
+#### Features
+- [ ] Advanced feature C
+- [ ] Integration with external APIs
+- [ ] Enhanced user interface
+
+#### Technical Debt
+- [ ] Code refactoring
+- [ ] Dependency updates
+- [ ] Architecture improvements
+
+### Version 1.0.0 (Major Release)
+**Target: Q4 2024**
+
+#### Features
+- [ ] Production-ready stability
+- [ ] Complete feature set
+- [ ] Comprehensive documentation
+
+#### Quality Assurance
+- [ ] Full test coverage
+- [ ] Performance benchmarks
+- [ ] Security audit
+
+## Long-term Vision
+
+### Future Considerations
+- Plugin system
+- Mobile support
+- Cloud integration
+- Advanced analytics
+
+## Contributing to the Roadmap
+
+We welcome community input on our roadmap! Please:
+
+1. Check existing [issues](https://github.com/yourusername/{self._to_package_name(project_name)}/issues) and [discussions](https://github.com/yourusername/{self._to_package_name(project_name)}/discussions)
+2. Create feature requests for new ideas
+3. Vote on existing proposals
+4. Join roadmap discussions
+
+## Get Involved
+
+- 🐛 [Report bugs](https://github.com/yourusername/{self._to_package_name(project_name)}/issues/new?template=bug_report.md)
+- 💡 [Request features](https://github.com/yourusername/{self._to_package_name(project_name)}/issues/new?template=feature_request.md)
+- 💬 [Join discussions](https://github.com/yourusername/{self._to_package_name(project_name)}/discussions)
+- 🛠️ [Contribute code](CONTRIBUTING.md)
+
+---
+
+*This roadmap is subject to change based on community feedback and project needs.*
+*Last updated: {metadata.get('date', '2024-01-01')}*
+'''
+        (project_path / "ROADMAP.md").write_text(content)
+
+    def _create_support(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create SUPPORT.md file."""
+        content = f'''# Support
+
+Looking for help with {project_name}? Here's how to get support.
+
+## Documentation
+
+Before asking for help, please check our documentation:
+
+- [README](README.md) - Basic usage and setup
+- [Contributing Guidelines](CONTRIBUTING.md) - How to contribute
+- [Changelog](CHANGELOG.md) - Recent changes and updates
+
+## Getting Help
+
+### Community Support
+
+The fastest way to get help is through our community channels:
+
+- **GitHub Discussions**: [Project Discussions](https://github.com/yourusername/{self._to_package_name(project_name)}/discussions)
+  - Ask questions
+  - Share ideas
+  - Get help from the community
+
+- **GitHub Issues**: [Report Issues](https://github.com/yourusername/{self._to_package_name(project_name)}/issues)
+  - Bug reports
+  - Feature requests
+  - Technical problems
+
+### Professional Support
+
+For commercial or priority support, contact us at {metadata.get('email', 'support@example.com')}.
+
+## FAQ
+
+### Common Questions
+
+**Q: How do I install {project_name}?**
+A: See the installation instructions in our [README](README.md).
+
+**Q: I found a bug, what should I do?**
+A: Please [create an issue](https://github.com/yourusername/{self._to_package_name(project_name)}/issues/new) with details about the bug.
+
+**Q: Can I contribute to the project?**
+A: Absolutely! Check out our [Contributing Guidelines](CONTRIBUTING.md).
+
+**Q: How do I request a new feature?**
+A: Create a [feature request](https://github.com/yourusername/{self._to_package_name(project_name)}/issues/new) on GitHub.
+
+## Response Times
+
+- **Community Support**: Best effort, typically within 1-3 days
+- **Bug Reports**: We aim to respond within 1 week
+- **Professional Support**: Within 24 hours (business days)
+
+## Code of Conduct
+
+Please note that all interactions must follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Contact
+
+- **General Questions**: [GitHub Discussions](https://github.com/yourusername/{self._to_package_name(project_name)}/discussions)
+- **Bug Reports**: [GitHub Issues](https://github.com/yourusername/{self._to_package_name(project_name)}/issues)
+- **Security Issues**: {metadata.get('email', 'security@example.com')} (see [Security Policy](SECURITY.md))
+- **Commercial Support**: {metadata.get('email', 'support@example.com')}
+
+Thank you for using {project_name}! 🚀
+'''
+        (project_path / "SUPPORT.md").write_text(content)
+
+    @staticmethod
+    def get_available_md_files():
+        """Get list of available Markdown documentation files."""
+        return {
+            "changelog": {
+                "name": "CHANGELOG.md",
+                "description": "Track all changes and releases",
+                "category": "Project Management",
+                "recommended": True
+            },
+            "contributors": {
+                "name": "CONTRIBUTORS.md", 
+                "description": "List project contributors and recognition",
+                "category": "Community",
+                "recommended": False
+            },
+            "code_of_conduct": {
+                "name": "CODE_OF_CONDUCT.md",
+                "description": "Community guidelines and behavior standards",
+                "category": "Community", 
+                "recommended": False
+            },
+            "security": {
+                "name": "SECURITY.md",
+                "description": "Security policy and vulnerability reporting",
+                "category": "Security",
+                "recommended": False
+            },
+            "contributing": {
+                "name": "CONTRIBUTING.md",
+                "description": "Guidelines for contributing to the project",
+                "category": "Development",
+                "recommended": False
+            },
+            "support": {
+                "name": "SUPPORT.md",
+                "description": "How to get help and support",
+                "category": "Support",
+                "recommended": False
+            },
+            "roadmap": {
+                "name": "ROADMAP.md",
+                "description": "Project roadmap and future plans",
+                "category": "Project Management",
+                "recommended": False
+            }
+        }
+
+    def create_md_file(self, project_path: Path, md_type: str, project_name: str, metadata: Dict[str, str]):
+        """Create a specific Markdown documentation file."""
+        md_creators = {
+            "changelog": self._create_changelog,
+            "contributors": self._create_contributors,
+            "code_of_conduct": self._create_code_of_conduct,
+            "security": self._create_security,
+            "contributing": self._create_contributing,
+            "support": self._create_support,
+            "roadmap": self._create_roadmap
+        }
+        
+        if md_type in md_creators:
+            md_creators[md_type](project_path, project_name, metadata)
+            return True
+        return False
+    
     def _generate_minimal_template(self, project_path: Path, project_name: str, package_name: str, features: Dict[str, bool], metadata: Dict[str, str]) -> bool:
         """Generate the minimal Python project template."""
         src_dir = project_path / "src" / package_name
@@ -1133,6 +1672,27 @@ venv/
         
         if features.get('readme', True):
             self._create_basic_readme(project_path, project_name, metadata)
+        
+        if features.get('changelog', True):
+            self._create_changelog(project_path, project_name, metadata)
+        
+        if features.get('contributors', False):
+            self._create_contributors(project_path, project_name, metadata)
+        
+        if features.get('code_of_conduct', False):
+            self._create_code_of_conduct(project_path, project_name, metadata)
+        
+        if features.get('security', False):
+            self._create_security(project_path, project_name, metadata)
+        
+        if features.get('contributing', False):
+            self._create_contributing(project_path, project_name, metadata)
+        
+        if features.get('support', False):
+            self._create_support(project_path, project_name, metadata)
+        
+        if features.get('roadmap', False):
+            self._create_roadmap(project_path, project_name, metadata)
         
         if features.get('gitignore', True):
             self._create_basic_gitignore(project_path)
@@ -5134,15 +5694,43 @@ def main():
     import sys
     
     parser = argparse.ArgumentParser(description="Python Project Generator CLI")
-    parser.add_argument("project_name", help="Name of the project to create")
-    parser.add_argument("-o", "--output", default=".", help="Output directory (default: current directory)")
-    parser.add_argument("-t", "--template", default="minimal-python", help="Template to use (default: minimal-python)")
-    parser.add_argument("--author", help="Author name")
-    parser.add_argument("--email", help="Author email")
-    parser.add_argument("--description", help="Project description")
-    parser.add_argument("--version", default="0.1.0", help="Initial version (default: 0.1.0)")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+    
+    # Generate project command
+    gen_parser = subparsers.add_parser("generate", help="Generate a new project")
+    gen_parser.add_argument("project_name", help="Name of the project to create")
+    gen_parser.add_argument("-o", "--output", default=".", help="Output directory (default: current directory)")
+    gen_parser.add_argument("-t", "--template", default="minimal-python", help="Template to use (default: minimal-python)")
+    gen_parser.add_argument("--author", help="Author name")
+    gen_parser.add_argument("--email", help="Author email")
+    gen_parser.add_argument("--description", help="Project description")
+    gen_parser.add_argument("--version", default="0.1.0", help="Initial version (default: 0.1.0)")
+    
+    # MD files command
+    md_parser = subparsers.add_parser("md", help="Manage Markdown documentation files")
+    md_subparsers = md_parser.add_subparsers(dest="md_action", help="MD file actions")
+    
+    # List available MD files
+    list_md_parser = md_subparsers.add_parser("list", help="List available Markdown files")
+    list_md_parser.add_argument("--category", help="Filter by category")
+    list_md_parser.add_argument("--recommended", action="store_true", help="Show only recommended files")
+    
+    # Add MD file to existing project
+    add_md_parser = md_subparsers.add_parser("add", help="Add Markdown file to existing project")
+    add_md_parser.add_argument("md_type", help="Type of MD file to add")
+    add_md_parser.add_argument("--project-path", default=".", help="Path to existing project (default: current directory)")
+    add_md_parser.add_argument("--project-name", help="Project name (auto-detected if not provided)")
+    add_md_parser.add_argument("--author", help="Author name")
+    add_md_parser.add_argument("--email", help="Author email")
+    
+    # Remove MD file from existing project
+    rm_md_parser = md_subparsers.add_parser("remove", help="Remove Markdown file from existing project")
+    rm_md_parser.add_argument("md_type", help="Type of MD file to remove")
+    rm_md_parser.add_argument("--project-path", default=".", help="Path to existing project (default: current directory)")
+    
+    # Legacy arguments for backwards compatibility
     parser.add_argument("--list-templates", action="store_true", help="List available templates")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
     
     args = parser.parse_args()
     
@@ -5152,7 +5740,7 @@ def main():
     
     generator = ProjectGenerator()
     
-    # List templates if requested
+    # Handle legacy list-templates flag
     if args.list_templates:
         templates = generator.template_manager.get_available_templates()
         print("Available templates:")
@@ -5161,12 +5749,30 @@ def main():
             print(f"    {template_info['description']}")
         return 0
     
-    # Generate project
+    # Handle commands
+    if args.command == "generate":
+        return _handle_generate_command(args, generator)
+    elif args.command == "md":
+        return _handle_md_command(args, generator)
+    else:
+        # For backwards compatibility, treat as legacy generate command
+        if hasattr(args, 'project_name'):
+            return _handle_legacy_generate(args, generator)
+        else:
+            parser.print_help()
+            return 1
+
+
+def _handle_generate_command(args, generator):
+    """Handle the generate project command."""
+    from datetime import datetime
+    
     metadata = {
         "author": args.author or "Your Name",
         "email": args.email or "your.email@example.com",
         "description": args.description or f"A {args.project_name} project",
         "version": args.version,
+        "date": datetime.now().strftime("%Y-%m-%d")
     }
     
     # Default features for CLI usage
@@ -5175,6 +5781,7 @@ def main():
         "tests": True,
         "pypi_packaging": True,
         "readme": True,
+        "changelog": True,
         "gitignore": True,
         "license": True,
     }
@@ -5192,6 +5799,189 @@ def main():
     if result:
         print("✅ Project generated successfully!")
         project_path = Path(args.output) / args.project_name
+        print(f"📁 Location: {project_path.absolute()}")
+        print("\nNext steps:")
+        print(f"  cd '{project_path}'")
+        print("  pip install -e .")
+        return 0
+    else:
+        print("❌ Project generation failed!")
+        return 1
+
+
+def _handle_md_command(args, generator):
+    """Handle Markdown documentation file commands."""
+    if args.md_action == "list":
+        return _list_md_files(args)
+    elif args.md_action == "add":
+        return _add_md_file(args, generator)
+    elif args.md_action == "remove":
+        return _remove_md_file(args)
+    else:
+        print("Please specify an MD action: list, add, or remove")
+        return 1
+
+
+def _list_md_files(args):
+    """List available Markdown documentation files."""
+    md_files = ProjectGenerator.get_available_md_files()
+    
+    print("Available Markdown Documentation Files:")
+    print("=" * 50)
+    
+    # Group by category
+    categories = {}
+    for md_type, info in md_files.items():
+        category = info["category"]
+        if category not in categories:
+            categories[category] = []
+        categories[category].append((md_type, info))
+    
+    for category, files in categories.items():
+        if args.category and category.lower() != args.category.lower():
+            continue
+            
+        print(f"\n📁 {category}")
+        print("-" * 30)
+        
+        for md_type, info in files:
+            if args.recommended and not info["recommended"]:
+                continue
+                
+            status = "⭐ RECOMMENDED" if info["recommended"] else "   Optional"
+            print(f"  {md_type:15} - {info['name']}")
+            print(f"  {' ' * 15}   {info['description']}")
+            print(f"  {' ' * 15}   {status}")
+            print()
+    
+    print("\nUsage Examples:")
+    print(f"  Add file:    python -m project_generator md add changelog")
+    print(f"  Remove file: python -m project_generator md remove changelog")
+    
+    return 0
+
+
+def _add_md_file(args, generator):
+    """Add a Markdown file to an existing project."""
+    from datetime import datetime
+    import os
+    
+    project_path = Path(args.project_path).resolve()
+    
+    if not project_path.exists():
+        print(f"❌ Project path does not exist: {project_path}")
+        return 1
+    
+    md_files = ProjectGenerator.get_available_md_files()
+    if args.md_type not in md_files:
+        print(f"❌ Unknown MD file type: {args.md_type}")
+        print(f"Available types: {', '.join(md_files.keys())}")
+        return 1
+    
+    # Auto-detect project name if not provided
+    project_name = args.project_name
+    if not project_name:
+        project_name = project_path.name
+    
+    # Check if file already exists
+    file_name = md_files[args.md_type]["name"]
+    file_path = project_path / file_name
+    
+    if file_path.exists():
+        response = input(f"⚠️  {file_name} already exists. Overwrite? (y/N): ")
+        if response.lower() != 'y':
+            print("❌ Operation cancelled")
+            return 1
+    
+    metadata = {
+        "author": args.author or "Your Name", 
+        "email": args.email or "your.email@example.com",
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "version": "0.1.0"
+    }
+    
+    # Create the MD file
+    success = generator.create_md_file(project_path, args.md_type, project_name, metadata)
+    
+    if success:
+        print(f"✅ Created {file_name} in {project_path}")
+        print(f"📝 Edit the file to customize it for your project")
+        return 0
+    else:
+        print(f"❌ Failed to create {file_name}")
+        return 1
+
+
+def _remove_md_file(args):
+    """Remove a Markdown file from an existing project."""
+    project_path = Path(args.project_path).resolve()
+    
+    if not project_path.exists():
+        print(f"❌ Project path does not exist: {project_path}")
+        return 1
+    
+    md_files = ProjectGenerator.get_available_md_files()
+    if args.md_type not in md_files:
+        print(f"❌ Unknown MD file type: {args.md_type}")
+        print(f"Available types: {', '.join(md_files.keys())}")
+        return 1
+    
+    file_name = md_files[args.md_type]["name"]
+    file_path = project_path / file_name
+    
+    if not file_path.exists():
+        print(f"❌ {file_name} does not exist in {project_path}")
+        return 1
+    
+    response = input(f"⚠️  Are you sure you want to remove {file_name}? (y/N): ")
+    if response.lower() != 'y':
+        print("❌ Operation cancelled")
+        return 1
+    
+    try:
+        file_path.unlink()
+        print(f"✅ Removed {file_name} from {project_path}")
+        return 0
+    except Exception as e:
+        print(f"❌ Failed to remove {file_name}: {e}")
+        return 1
+
+
+def _handle_legacy_generate(args, generator):
+    """Handle legacy generate command format for backwards compatibility."""
+    from datetime import datetime
+    
+    metadata = {
+        "author": getattr(args, 'author', None) or "Your Name",
+        "email": getattr(args, 'email', None) or "your.email@example.com", 
+        "description": getattr(args, 'description', None) or f"A {args.project_name} project",
+        "version": getattr(args, 'version', None) or "0.1.0",
+        "date": datetime.now().strftime("%Y-%m-%d")
+    }
+    
+    features = {
+        "cli": True,
+        "tests": True,
+        "pypi_packaging": True,
+        "readme": True,
+        "changelog": True,
+        "gitignore": True,
+        "license": True,
+    }
+    
+    print(f"Generating project '{args.project_name}' using template '{getattr(args, 'template', 'minimal-python')}'...")
+    
+    result = generator.generate_project(
+        project_name=args.project_name,
+        output_dir=Path(getattr(args, 'output', '.')),
+        template_id=getattr(args, 'template', 'minimal-python'),
+        features=features,
+        metadata=metadata
+    )
+    
+    if result:
+        print("✅ Project generated successfully!")
+        project_path = Path(getattr(args, 'output', '.')) / args.project_name
         print(f"📁 Location: {project_path.absolute()}")
         print("\nNext steps:")
         print(f"  cd '{project_path}'")
