@@ -787,6 +787,36 @@ class ProjectGenerator:
         
         # Remove unwanted features
         self._remove_unwanted_features(project_path, features)
+        
+        # Add common documentation files if selected
+        self._apply_common_docs(project_path, project_name, features, metadata)
+
+    def _apply_common_docs(self, project_path: Path, project_name: str, features: Dict[str, bool], metadata: Dict[str, str]) -> None:
+        """Create selected common Markdown files across all templates."""
+        md_feature_to_type = {
+            'changelog': 'changelog',
+            'contributors': 'contributors',
+            'code_of_conduct': 'code_of_conduct',
+            'security': 'security',
+            'contributing': 'contributing',
+            'support': 'support',
+            'roadmap': 'roadmap',
+            'configuration': 'configuration',
+            'faq': 'faq',
+            'getting_started': 'getting_started',
+            'index': 'index',
+            'install': 'install',
+            'intro': 'intro',
+            'summary': 'summary',
+            'todo': 'todo',
+            'usage': 'usage',
+        }
+        for feature_key, md_type in md_feature_to_type.items():
+            if features.get(feature_key, False):
+                try:
+                    self.create_md_file(project_path, md_type, project_name, metadata)
+                except Exception as e:
+                    self.logger.warning(f"Could not create {md_type}: {e}")
     
     def _update_package_references(self, project_path: Path, project_name: str, package_name: str, metadata: Dict[str, str]):
         """Update package references throughout the project."""
@@ -1590,48 +1620,103 @@ Thank you for using {project_name}! 🚀
     @staticmethod
     def get_available_md_files():
         """Get list of available Markdown documentation files."""
+        # Organized alphabetically by file name
         return {
             "changelog": {
                 "name": "CHANGELOG.md",
                 "description": "Track all changes and releases",
-                "category": "Project Management",
+                "category": "Documentation",
                 "recommended": True
-            },
-            "contributors": {
-                "name": "CONTRIBUTORS.md", 
-                "description": "List project contributors and recognition",
-                "category": "Community",
-                "recommended": False
             },
             "code_of_conduct": {
                 "name": "CODE_OF_CONDUCT.md",
                 "description": "Community guidelines and behavior standards",
-                "category": "Community", 
+                "category": "Documentation", 
                 "recommended": False
             },
-            "security": {
-                "name": "SECURITY.md",
-                "description": "Security policy and vulnerability reporting",
-                "category": "Security",
+            "configuration": {
+                "name": "CONFIGURATION.md",
+                "description": "Configuration options and examples",
+                "category": "Documentation",
                 "recommended": False
             },
             "contributing": {
                 "name": "CONTRIBUTING.md",
                 "description": "Guidelines for contributing to the project",
-                "category": "Development",
+                "category": "Documentation",
                 "recommended": False
             },
-            "support": {
-                "name": "SUPPORT.md",
-                "description": "How to get help and support",
-                "category": "Support",
+            "contributors": {
+                "name": "CONTRIBUTORS.md", 
+                "description": "List project contributors and recognition",
+                "category": "Documentation",
+                "recommended": False
+            },
+            "faq": {
+                "name": "FAQ.md",
+                "description": "Frequently Asked Questions",
+                "category": "Documentation",
+                "recommended": False
+            },
+            "getting_started": {
+                "name": "GETTING-STARTED.md",
+                "description": "Quick start guide for new users",
+                "category": "Documentation",
+                "recommended": True
+            },
+            "index": {
+                "name": "INDEX.md",
+                "description": "Index of documentation pages",
+                "category": "Documentation",
+                "recommended": False
+            },
+            "install": {
+                "name": "INSTALL.md",
+                "description": "Installation instructions",
+                "category": "Documentation",
+                "recommended": True
+            },
+            "intro": {
+                "name": "INTRO.md",
+                "description": "Introduction to the project",
+                "category": "Documentation",
                 "recommended": False
             },
             "roadmap": {
                 "name": "ROADMAP.md",
                 "description": "Project roadmap and future plans",
-                "category": "Project Management",
+                "category": "Documentation",
                 "recommended": False
+            },
+            "security": {
+                "name": "SECURITY.md",
+                "description": "Security policy and vulnerability reporting",
+                "category": "Documentation",
+                "recommended": False
+            },
+            "summary": {
+                "name": "SUMMARY.md",
+                "description": "Summary of documentation sections",
+                "category": "Documentation",
+                "recommended": False
+            },
+            "support": {
+                "name": "SUPPORT.md",
+                "description": "How to get help and support",
+                "category": "Documentation",
+                "recommended": False
+            },
+            "todo": {
+                "name": "TODO.md",
+                "description": "Task list and backlog",
+                "category": "Documentation",
+                "recommended": False
+            },
+            "usage": {
+                "name": "USAGE.md",
+                "description": "How to use the project",
+                "category": "Documentation",
+                "recommended": True
             }
         }
 
@@ -1644,7 +1729,16 @@ Thank you for using {project_name}! 🚀
             "security": self._create_security,
             "contributing": self._create_contributing,
             "support": self._create_support,
-            "roadmap": self._create_roadmap
+            "roadmap": self._create_roadmap,
+            "faq": self._create_faq,
+            "getting_started": self._create_getting_started,
+            "index": self._create_index,
+            "install": self._create_install,
+            "intro": self._create_intro,
+            "summary": self._create_summary,
+            "todo": self._create_todo,
+            "usage": self._create_usage,
+            "configuration": self._create_configuration,
         }
         
         if md_type in md_creators:
@@ -5666,6 +5760,164 @@ class ProcessorPlugin(Plugin):
 {metadata.get('author', 'Your Name')} - {metadata.get('email', 'your.email@example.com')}
 '''
         (project_path / "README.md").write_text(content)
+
+    def _create_faq(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create FAQ.md file."""
+        content = f'''# Frequently Asked Questions (FAQ)
+
+## General
+
+### What is {project_name}?
+{metadata.get('description', f'{project_name} is a Python project')}
+
+### What Python versions are supported?
+Python 3.8 and above.
+
+## Installation
+
+### How do I install dependencies?
+```bash
+pip install -e .
+```
+
+## Usage
+
+### How do I run the project?
+See [USAGE](USAGE.md) for detailed usage instructions.
+
+## Contributing
+
+See [CONTRIBUTING](CONTRIBUTING.md) for how to contribute.
+'''
+        (project_path / "FAQ.md").write_text(content)
+
+    def _create_getting_started(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create GETTING-STARTED.md file."""
+        content = f'''# Getting Started
+
+Welcome to {project_name}! This guide will help you get up and running quickly.
+
+## Prerequisites
+- Python 3.8+
+- pip
+
+## Setup
+```bash
+git clone <your-repo-url>
+cd {self._to_package_name(project_name)}
+pip install -e .
+```
+
+## First Run
+```bash
+python -m {self._to_package_name(project_name)}
+```
+
+See [USAGE](USAGE.md) for more details.
+'''
+        (project_path / "GETTING-STARTED.md").write_text(content)
+
+    def _create_index(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create INDEX.md file."""
+        content = f'''# Documentation Index
+
+- [INTRO](INTRO.md)
+- [GETTING-STARTED](GETTING-STARTED.md)
+- [INSTALL](INSTALL.md)
+- [USAGE](USAGE.md)
+- [CONFIGURATION](CONFIGURATION.md)
+- [FAQ](FAQ.md)
+- [SUMMARY](SUMMARY.md)
+- [ROADMAP](ROADMAP.md)
+- [CONTRIBUTING](CONTRIBUTING.md)
+- [CODE OF CONDUCT](CODE_OF_CONDUCT.md)
+- [SECURITY](SECURITY.md)
+'''
+        (project_path / "INDEX.md").write_text(content)
+
+    def _create_install(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create INSTALL.md file."""
+        content = f'''# Installation
+
+## From Source
+```bash
+git clone <your-repo-url>
+cd {self._to_package_name(project_name)}
+pip install -e .
+```
+
+## From PyPI
+```bash
+pip install {self._to_package_name(project_name).replace('_','-')}
+```
+'''
+        (project_path / "INSTALL.md").write_text(content)
+
+    def _create_intro(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create INTRO.md file."""
+        content = f'''# Introduction
+
+Welcome to {project_name}! {metadata.get('description', '')}
+
+This document provides context and background for the project.
+'''
+        (project_path / "INTRO.md").write_text(content)
+
+    def _create_summary(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create SUMMARY.md file."""
+        content = f'''# Summary
+
+- Project: {project_name}
+- Version: {metadata.get('version', '0.1.0')}
+- Description: {metadata.get('description', '')}
+
+See [INDEX](INDEX.md) for all documentation.
+'''
+        (project_path / "SUMMARY.md").write_text(content)
+
+    def _create_todo(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create TODO.md file."""
+        content = f'''# TODO
+
+- [ ] Initial setup
+- [ ] Write tests
+- [ ] Add CI/CD
+- [ ] Update documentation
+
+Add more tasks as needed.
+'''
+        (project_path / "TODO.md").write_text(content)
+
+    def _create_usage(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create USAGE.md file."""
+        content = f'''# Usage
+
+## Basic
+```bash
+python -m {self._to_package_name(project_name)}
+```
+
+## As a Library
+```python
+from {self._to_package_name(project_name)} import {self._to_class_name(self._to_package_name(project_name))}
+app = {self._to_class_name(self._to_package_name(project_name))}()
+app.run()
+```
+'''
+        (project_path / "USAGE.md").write_text(content)
+
+    def _create_configuration(self, project_path: Path, project_name: str, metadata: Dict[str, str]):
+        """Create CONFIGURATION.md file."""
+        content = f'''# Configuration
+
+Describe configuration options for {project_name} here, e.g.:
+
+```ini
+[project]
+log_level=INFO
+```
+'''
+        (project_path / "CONFIGURATION.md").write_text(content)
 
 
 def setup_logging(level: str = "INFO") -> None:

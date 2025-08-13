@@ -18,7 +18,7 @@ except ImportError:
     scrolled = None
     WX_AVAILABLE = False
 
-from .project_generator import ProjectGenerator, TemplateManager, setup_logging
+from project_generator import ProjectGenerator, TemplateManager, setup_logging
 
 __version__ = "1.0.0"
 
@@ -204,12 +204,20 @@ if WX_AVAILABLE:
             info_sizer.Add(left_panel, 1, wx.ALL | wx.EXPAND, 5)
             info_sizer.Add(right_panel, 1, wx.ALL | wx.EXPAND, 5)
             
+            # MD files info button
+            md_button_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            self.view_md_button = wx.Button(panel, label="View Common MD Files")
+            self.view_md_button.SetToolTip("Show a categorized list of common Markdown documentation files")
+            self.view_md_button.Bind(wx.EVT_BUTTON, self.on_view_md_files)
+            md_button_sizer.Add(self.view_md_button, 0, wx.ALL, 5)
+            
             # Update info for default selection
             self.update_template_info()
             
             # Layout
             sizer.Add(template_label, 0, wx.ALL, 10)
             sizer.Add(self.template_choice, 0, wx.ALL | wx.EXPAND, 10)
+            sizer.Add(md_button_sizer, 0, wx.ALL | wx.ALIGN_LEFT, 5)
             sizer.Add(info_sizer, 1, wx.ALL | wx.EXPAND, 10)
             
             panel.SetSizer(sizer)
@@ -321,7 +329,8 @@ if WX_AVAILABLE:
             # Create feature checkboxes
             self.feature_checkboxes = {}
             
-            features = [
+            # Core features (non-doc)
+            core_features = [
                 ("cli", "Command Line Interface (CLI)", True, "Add a CLI with argument parsing"),
                 ("gui", "Graphical User Interface (GUI)", False, "Add a wxPython-based GUI"),
                 ("tests", "Unit Tests", True, "Include pytest test framework"),
@@ -329,27 +338,61 @@ if WX_AVAILABLE:
                 ("pypi_packaging", "PyPI Packaging", True, "Include setup.py and pyproject.toml for PyPI"),
                 ("dev_requirements", "Development Requirements", True, "Include development dependencies"),
                 ("license", "License File", True, "Include LICENSE file"),
-                ("readme", "README.md", True, "Include comprehensive README file"),
-                ("changelog", "CHANGELOG.md", True, "Track all changes and releases"),
-                ("contributors", "CONTRIBUTORS.md", False, "List project contributors and recognition"),
-                ("code_of_conduct", "CODE_OF_CONDUCT.md", False, "Community guidelines and behavior standards"),
-                ("security", "SECURITY.md", False, "Security policy and vulnerability reporting"),
-                ("contributing", "CONTRIBUTING.md", False, "Guidelines for contributing to the project"),
-                ("support", "SUPPORT.md", False, "How to get help and support"),
-                ("roadmap", "ROADMAP.md", False, "Project roadmap and future plans"),
                 ("makefile", "Makefile", False, "Include Makefile for common tasks"),
                 ("gitignore", ".gitignore", True, "Include .gitignore file"),
                 ("github_actions", "GitHub Actions CI", False, "Include GitHub Actions workflow"),
             ]
-            
-            for feature_id, label, default, tooltip in features:
+
+            # Documentation features (MD files)
+            md_info = ProjectGenerator.get_available_md_files()
+            # Sort by file name alphabetically
+            sorted_md = sorted(md_info.items(), key=lambda kv: kv[1]["name"].lower())
+            documentation_features = []
+            for feature_id, info in sorted_md:
+                # Map md feature id to checkbox default: recommend true if recommended, else False
+                default = info.get("recommended", False)
+                documentation_features.append((feature_id, info["name"], default, info["description"]))
+
+            # Core features header
+            core_header = wx.StaticText(panel, label="Core Features")
+            core_font = core_header.GetFont()
+            core_font.SetWeight(wx.FONTWEIGHT_BOLD)
+            core_header.SetFont(core_font)
+            sizer.Add(core_header, 0, wx.LEFT | wx.TOP, 10)
+
+            for feature_id, label, default, tooltip in core_features:
                 checkbox = wx.CheckBox(panel, label=label)
                 checkbox.SetValue(default)
                 checkbox.SetToolTip(tooltip)
                 self.feature_checkboxes[feature_id] = checkbox
                 sizer.Add(checkbox, 0, wx.ALL, 5)
-            
-            # Add buttons for selecting all/none
+
+            sizer.Add(wx.StaticLine(panel), 0, wx.ALL | wx.EXPAND, 10)
+
+            # Documentation features header
+            docs_header_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            docs_header = wx.StaticText(panel, label="Documentation (Markdown) Files")
+            docs_font = docs_header.GetFont()
+            docs_font.SetWeight(wx.FONTWEIGHT_BOLD)
+            docs_header.SetFont(docs_font)
+            docs_header_sizer.Add(docs_header, 0, wx.RIGHT | wx.ALIGN_CENTER_VERTICAL, 10)
+            # Quick buttons to select all/none docs
+            docs_select_all = wx.Button(panel, label="Select All Docs")
+            docs_select_none = wx.Button(panel, label="Select No Docs")
+            docs_select_all.Bind(wx.EVT_BUTTON, lambda e: self._set_doc_checkboxes(True))
+            docs_select_none.Bind(wx.EVT_BUTTON, lambda e: self._set_doc_checkboxes(False))
+            docs_header_sizer.Add(docs_select_all, 0, wx.RIGHT, 5)
+            docs_header_sizer.Add(docs_select_none, 0)
+            sizer.Add(docs_header_sizer, 0, wx.LEFT | wx.TOP | wx.BOTTOM, 10)
+
+            for feature_id, label, default, tooltip in documentation_features:
+                checkbox = wx.CheckBox(panel, label=label)
+                checkbox.SetValue(default)
+                checkbox.SetToolTip(tooltip)
+                self.feature_checkboxes[feature_id] = checkbox
+                sizer.Add(checkbox, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 5)
+
+            # Add buttons for selecting all/none (global)
             button_sizer = wx.BoxSizer(wx.HORIZONTAL)
             select_all_btn = wx.Button(panel, label="Select All")
             select_none_btn = wx.Button(panel, label="Select None")
@@ -365,7 +408,87 @@ if WX_AVAILABLE:
             
             panel.SetSizer(sizer)
             return panel
-            
+
+        def _set_doc_checkboxes(self, value: bool) -> None:
+            """Helper to set only documentation feature checkboxes to value."""
+            md_keys = set(ProjectGenerator.get_available_md_files().keys())
+            for key, checkbox in self.feature_checkboxes.items():
+                if key in md_keys:
+                    checkbox.SetValue(value)
+
+        def on_view_md_files(self, event):
+            """Show a dialog listing and allowing selection of common Markdown files."""
+            md_files = ProjectGenerator.get_available_md_files()
+
+            dialog = wx.Dialog(self, title="Select Documentation Files", size=(700, 600))
+            dlg_sizer = wx.BoxSizer(wx.VERTICAL)
+
+            # Instructions
+            instructions = wx.StaticText(dialog, label="Select the documentation files to include in your project:")
+            dlg_sizer.Add(instructions, 0, wx.ALL, 10)
+
+            # Scrolled area with checkboxes
+            scroller = scrolled.ScrolledPanel(dialog, size=(-1, 450))
+            scroller.SetupScrolling()
+            sc_sizer = wx.BoxSizer(wx.VERTICAL)
+
+            # Sort md files by name
+            sorted_md = sorted(md_files.items(), key=lambda kv: kv[1]['name'].lower())
+            self._md_dialog_checkboxes = {}
+            for md_key, info in sorted_md:
+                cb = wx.CheckBox(scroller, label=f"{info['name']}")
+                # Initialize to current feature checkbox value if exists
+                current_val = False
+                if md_key in self.feature_checkboxes:
+                    current_val = self.feature_checkboxes[md_key].GetValue()
+                else:
+                    # default to recommended
+                    current_val = info.get('recommended', False)
+                cb.SetValue(current_val)
+                cb.SetToolTip(info['description'])
+                self._md_dialog_checkboxes[md_key] = cb
+                sc_sizer.Add(cb, 0, wx.ALL, 5)
+
+            scroller.SetSizer(sc_sizer)
+            dlg_sizer.Add(scroller, 1, wx.ALL | wx.EXPAND, 10)
+
+            # Dialog buttons
+            btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
+            select_all = wx.Button(dialog, label="Select All")
+            select_none = wx.Button(dialog, label="Select None")
+            apply_btn = wx.Button(dialog, label="Apply")
+            close_btn = wx.Button(dialog, label="Close")
+
+            def set_all(val: bool):
+                for cb in self._md_dialog_checkboxes.values():
+                    cb.SetValue(val)
+
+            select_all.Bind(wx.EVT_BUTTON, lambda e: set_all(True))
+            select_none.Bind(wx.EVT_BUTTON, lambda e: set_all(False))
+
+            def apply_changes(evt):
+                # Sync dialog selections into feature checkboxes
+                for md_key, cb in self._md_dialog_checkboxes.items():
+                    if md_key in self.feature_checkboxes:
+                        self.feature_checkboxes[md_key].SetValue(cb.GetValue())
+                dialog.EndModal(wx.ID_OK)
+
+            apply_btn.Bind(wx.EVT_BUTTON, apply_changes)
+            close_btn.Bind(wx.EVT_BUTTON, lambda e: dialog.EndModal(wx.ID_CANCEL))
+
+            btn_sizer.Add(select_all, 0, wx.ALL, 5)
+            btn_sizer.Add(select_none, 0, wx.ALL, 5)
+            btn_sizer.AddStretchSpacer(1)
+            btn_sizer.Add(apply_btn, 0, wx.ALL, 5)
+            btn_sizer.Add(close_btn, 0, wx.ALL, 5)
+
+            dlg_sizer.Add(btn_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, 10)
+
+            dialog.SetSizer(dlg_sizer)
+            dialog.Layout()
+            dialog.ShowModal()
+            dialog.Destroy()
+        
         def create_output_panel(self):
             """Create the output/log panel."""
             panel = wx.Panel(self.notebook)
@@ -725,6 +848,45 @@ if WX_AVAILABLE:
                 "url": self.url_ctrl.GetValue().strip(),
                 "license_type": selected_license,
             }
+
+        def on_view_md_files(self, event):
+            """Show a dialog listing common Markdown documentation files."""
+            md_files = ProjectGenerator.get_available_md_files()
+            
+            # Build categorized text
+            categories = {}
+            for md_type, info in md_files.items():
+                category = info.get("category", "Other")
+                categories.setdefault(category, []).append((md_type, info))
+            
+            text_lines = []
+            text_lines.append("Common Markdown Documentation Files\n")
+            for category in sorted(categories.keys()):
+                text_lines.append(f"=== {category} ===")
+                for md_type, info in sorted(categories[category], key=lambda x: x[1]['name']):
+                    star = "⭐" if info.get("recommended") else "-"
+                    text_lines.append(f"{star} {info['name']} ({md_type})")
+                    text_lines.append(f"    {info['description']}")
+                text_lines.append("")
+            
+            # Fallback simple modal dialog using a read-only multiline TextCtrl
+            dialog = wx.Dialog(self, title="Common MD Files", size=(750, 550))
+            vbox = wx.BoxSizer(wx.VERTICAL)
+            text_ctrl = wx.TextCtrl(
+                dialog,
+                value="\n".join(text_lines),
+                style=wx.TE_MULTILINE | wx.TE_READONLY | wx.HSCROLL,
+                size=(-1, 460)
+            )
+            # Use monospaced font
+            text_ctrl.SetFont(wx.Font(10, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
+            vbox.Add(text_ctrl, 1, wx.ALL | wx.EXPAND, 10)
+            btn = wx.Button(dialog, wx.ID_OK, label="Close")
+            vbox.Add(btn, 0, wx.ALIGN_RIGHT | wx.ALL, 10)
+            dialog.SetSizer(vbox)
+            dialog.Layout()
+            dialog.ShowModal()
+            dialog.Destroy()
 
 
     class ProjectGeneratorApp(wx.App):
