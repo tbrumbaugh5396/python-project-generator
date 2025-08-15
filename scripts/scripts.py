@@ -10,6 +10,13 @@ import subprocess
 import shutil
 from pathlib import Path
 
+# Always operate from the repository root (parent of this file's directory)
+THIS_DIR = Path(__file__).resolve().parent
+REPO_ROOT = THIS_DIR.parent
+if Path.cwd().resolve() != REPO_ROOT:
+    os.chdir(REPO_ROOT)
+    print(f"📍 Working directory changed to repository root: {REPO_ROOT}")
+
 
 def run_command(command, description=""):
     """Run a command and handle errors."""
