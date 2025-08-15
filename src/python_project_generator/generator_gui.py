@@ -18,7 +18,22 @@ except ImportError:
     scrolled = None
     WX_AVAILABLE = False
 
-from project_generator import ProjectGenerator, TemplateManager, setup_logging
+# Support running as a package (preferred) and also directly for dev
+try:
+    from .project_generator import ProjectGenerator, TemplateManager, setup_logging  # type: ignore
+except Exception:
+    try:
+        # When executed via plain python on installed package name
+        from python_project_generator.project_generator import ProjectGenerator, TemplateManager, setup_logging  # type: ignore
+    except Exception:
+        import sys as _sys
+        import os as _os
+        # Add src/ parent of package to path for direct file execution in repo
+        _repo_root = _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "..", ".."))
+        _src_dir = _os.path.join(_repo_root, "src")
+        if _src_dir not in _sys.path:
+            _sys.path.insert(0, _src_dir)
+        from python_project_generator.project_generator import ProjectGenerator, TemplateManager, setup_logging  # type: ignore
 
 __version__ = "1.0.0"
 
@@ -343,6 +358,15 @@ if WX_AVAILABLE:
                 ("github_actions", "GitHub Actions CI", False, "Include GitHub Actions workflow"),
             ]
 
+            # Build & Utilities features
+            utilities_features = [
+                ("mac_app_bundle", "macOS .app Bundle Script", False, "Add scripts/create_app_bundle.py to build a .app (macOS)"),
+                ("icon_generator", "Icon Generator Script", False, "Add scripts/create_icon.py to generate icons"),
+                ("remove_git_tracking", "Delete Git Tracking Helper", False, "Add scripts/delete_git_tracking.txt with rm -rf .git"),
+                ("freeze_requirements", "Freeze requirements script", False, "Add scripts/freeze_requirements.py to write requirements.txt"),
+                ("setup_build_script", "Build with setup.py script", False, "Add scripts/build_with_setup.py helper"),
+            ]
+
             # Documentation features (MD files)
             md_info = ProjectGenerator.get_available_md_files()
             # Sort by file name alphabetically
@@ -367,7 +391,25 @@ if WX_AVAILABLE:
                 self.feature_checkboxes[feature_id] = checkbox
                 sizer.Add(checkbox, 0, wx.ALL, 5)
 
+            # Bind auto-select for freeze_requirements when dev_requirements is checked
+            if 'dev_requirements' in self.feature_checkboxes:
+                self.feature_checkboxes['dev_requirements'].Bind(wx.EVT_CHECKBOX, self._on_dev_requirements_toggle)
+
             sizer.Add(wx.StaticLine(panel), 0, wx.ALL | wx.EXPAND, 10)
+
+            # Utilities header
+            utilities_header = wx.StaticText(panel, label="Build & Utilities")
+            utilities_font = utilities_header.GetFont()
+            utilities_font.SetWeight(wx.FONTWEIGHT_BOLD)
+            utilities_header.SetFont(utilities_font)
+            sizer.Add(utilities_header, 0, wx.LEFT | wx.TOP, 10)
+
+            for feature_id, label, default, tooltip in utilities_features:
+                checkbox = wx.CheckBox(panel, label=label)
+                checkbox.SetValue(default)
+                checkbox.SetToolTip(tooltip)
+                self.feature_checkboxes[feature_id] = checkbox
+                sizer.Add(checkbox, 0, wx.ALL, 5)
 
             # Documentation features header
             docs_header_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -415,6 +457,13 @@ if WX_AVAILABLE:
             for key, checkbox in self.feature_checkboxes.items():
                 if key in md_keys:
                     checkbox.SetValue(value)
+
+        def _on_dev_requirements_toggle(self, event):
+            """Auto-enable freeze_requirements when dev_requirements is selected."""
+            dev_cb = self.feature_checkboxes.get('dev_requirements')
+            freeze_cb = self.feature_checkboxes.get('freeze_requirements')
+            if dev_cb and freeze_cb and dev_cb.GetValue():
+                freeze_cb.SetValue(True)
 
         def on_view_md_files(self, event):
             """Show a dialog listing and allowing selection of common Markdown files."""
@@ -674,6 +723,27 @@ if WX_AVAILABLE:
             
             if features.get('gitignore'):
                 self.log_to_output("├── .gitignore")
+
+            # Optional helper scripts
+            # Optional helper scripts under scripts/
+            if any([
+                features.get('mac_app_bundle'),
+                features.get('icon_generator'),
+                features.get('remove_git_tracking'),
+                features.get('freeze_requirements'),
+                features.get('setup_build_script')
+            ]):
+                self.log_to_output("├── scripts/")
+                if features.get('mac_app_bundle'):
+                    self.log_to_output("│   ├── create_app_bundle.py")
+                if features.get('icon_generator'):
+                    self.log_to_output("│   ├── create_icon.py")
+                if features.get('remove_git_tracking'):
+                    self.log_to_output("│   ├── delete_git_tracking.txt")
+                if features.get('freeze_requirements'):
+                    self.log_to_output("│   ├── freeze_requirements.py")
+                if features.get('setup_build_script'):
+                    self.log_to_output("│   └── build_with_setup.py")
             
             self.log_to_output("")
             self.log_to_output("=== End Preview ===")
@@ -790,7 +860,9 @@ if WX_AVAILABLE:
             defaults = {
                 'cli': True, 'gui': False, 'tests': True, 'executable': False,
                 'pypi_packaging': True, 'dev_requirements': True, 'license': True,
-                'readme': True, 'makefile': False, 'gitignore': True, 'github_actions': False
+                'readme': True, 'makefile': False, 'gitignore': True, 'github_actions': False,
+                'mac_app_bundle': False, 'icon_generator': False, 'remove_git_tracking': False,
+                'freeze_requirements': False, 'setup_build_script': False
             }
             
             for feature_id, checkbox in self.feature_checkboxes.items():

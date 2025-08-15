@@ -11,9 +11,11 @@ from setuptools import setup, find_packages
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text(encoding='utf-8')
 
+
 # Read requirements
 def read_requirements(filename):
     """Read requirements from file."""
+
     requirements_file = this_directory / filename
     if requirements_file.exists():
         with open(requirements_file, 'r', encoding='utf-8') as f:
@@ -26,12 +28,12 @@ def read_requirements(filename):
             return requirements
     return []
 
-# Read version from project_generator.py
+
+# Read version from the package __init__.py in src layout
 def get_version():
-    """Extract version from the main module."""
-    version_file = this_directory / "project_generator.py"
+    """Extract version from src/python_project_generator/__init__.py."""
+    version_file = this_directory / "src" / "python_project_generator" / "__init__.py"
     if version_file.exists():
-        # Try to extract __version__ if it exists
         import re
         content = version_file.read_text(encoding='utf-8')
         version_match = re.search(r"__version__\s*=\s*['\"]([^'\"]*)['\"]", content)
@@ -53,8 +55,10 @@ setup(
         "Source": "https://github.com/python-project-generator/python-project-generator",
         "Documentation": "https://python-project-generator.readthedocs.io/",
     },
-    packages=find_packages(where="."),
-    py_modules=["project_generator", "generator_gui", "run"],
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    py_modules=[],
+    include_package_data=True,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
@@ -83,17 +87,13 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "python-project-generator=project_generator:main",
-            "pyproj-gen=project_generator:main",
+            "python-project-generator=python_project_generator.project_generator:main",
+            "pyproj-gen=python_project_generator.project_generator:main",
         ],
         "gui_scripts": [
-            "python-project-generator-gui=generator_gui:main",
-            "pyproj-gen-gui=generator_gui:main",
+            "python-project-generator-gui=python_project_generator.generator_gui:main",
+            "pyproj-gen-gui=python_project_generator.generator_gui:main",
         ],
-    },
-    include_package_data=True,
-    package_data={
-        "": ["*.md", "*.txt", "*.yml", "*.yaml", "*.json"],
     },
     zip_safe=False,
     platforms=["any"],

@@ -68,19 +68,21 @@ all = [
 ]
 
 [project.scripts]
-python-project-generator = "project_generator:main"
-pyproj-gen = "project_generator:main"
+python-project-generator = "python_project_generator.project_generator:main"
+pyproj-gen = "python_project_generator.project_generator:main"
 
 [project.gui-scripts]
-python-project-generator-gui = "generator_gui:main"
-pyproj-gen-gui = "generator_gui:main"
+python-project-generator-gui = "python_project_generator.generator_gui:main"
+pyproj-gen-gui = "python_project_generator.generator_gui:main"
 
 [tool.setuptools]
-py-modules = ["project_generator", "generator_gui", "run"]
 include-package-data = true
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.setuptools.dynamic]
-version = {attr = "project_generator.__version__"}
+version = {attr = "python_project_generator.__version__"}
 
 [tool.setuptools.package-data]
 "*" = ["*.md", "*.txt", "*.yml", "*.yaml", "*.json"]
@@ -119,7 +121,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["project_generator", "generator_gui"]
+source = ["python_project_generator"]
 omit = [
     "*/tests/*",
     "*/test_*",

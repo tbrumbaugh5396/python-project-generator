@@ -6,8 +6,16 @@ import unittest
 import tempfile
 import shutil
 from pathlib import Path
+import sys
 
-from project_generator import ProjectGenerator, TemplateManager
+
+# Ensure src/ is on sys.path when running this file directly with `python tests/...`
+_ROOT = Path(__file__).resolve().parents[1]
+_SRC = _ROOT / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+
+from python_project_generator.project_generator import ProjectGenerator, TemplateManager
 
 
 class TestTemplateManager(unittest.TestCase):
@@ -15,10 +23,12 @@ class TestTemplateManager(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures."""
+
         self.template_manager = TemplateManager()
     
     def test_get_available_templates(self):
         """Test getting available templates."""
+
         templates = self.template_manager.get_available_templates()
         self.assertIsInstance(templates, dict)
         self.assertIn("minimal-python", templates)
@@ -38,16 +48,19 @@ class TestProjectGenerator(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures."""
+
         self.generator = ProjectGenerator()
         self.temp_dir = Path(tempfile.mkdtemp())
     
     def tearDown(self):
         """Clean up test fixtures."""
+
         if self.temp_dir.exists():
             shutil.rmtree(self.temp_dir)
     
     def test_generate_minimal_project(self):
         """Test generating a minimal project."""
+
         project_name = "test_project"
         features = {
             "cli": False,
@@ -95,6 +108,7 @@ class TestProjectGenerator(unittest.TestCase):
     
     def test_generate_flask_project(self):
         """Test generating a Flask project."""
+
         project_name = "test_flask_app"
         features = {
             "web_framework": True,
@@ -135,6 +149,7 @@ class TestProjectGenerator(unittest.TestCase):
     
     def test_package_name_conversion(self):
         """Test package name conversion."""
+
         test_cases = [
             ("my-project", "my_project"),
             ("My Project", "my_project"),
@@ -148,6 +163,7 @@ class TestProjectGenerator(unittest.TestCase):
     
     def test_class_name_conversion(self):
         """Test class name conversion."""
+        
         test_cases = [
             ("my_project", "MyProject"),
             ("simple", "Simple"),

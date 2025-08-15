@@ -30,9 +30,9 @@ class TemplateManager:
         self.default_templates = {
             "python-skeleton": {
                 "name": "Python Skeleton Project",
-                "description": "Complete Python project with CLI, GUI, testing, and packaging",
-                "source": "https://github.com/yourusername/python-skeleton-project.git",
-                "type": "git",
+                "description": "Complete Python project with CLI, GUI, testing, and packaging (builtin)",
+                "source": "local",
+                "type": "builtin",
                 "features": ["cli", "gui", "tests", "executable", "pypi_packaging", "dev_requirements", "license", "readme", "changelog", "contributors", "code_of_conduct", "security", "makefile", "gitignore", "github_actions"]
             },
             "minimal-python": {
@@ -791,6 +791,292 @@ class ProjectGenerator:
         # Add common documentation files if selected
         self._apply_common_docs(project_path, project_name, features, metadata)
 
+        # Add optional utility/build scripts
+        self._apply_optional_scripts(project_path, project_name, package_name, features, metadata)
+
+    def _apply_optional_scripts(self, project_path: Path, project_name: str, package_name: str, features: Dict[str, bool], metadata: Dict[str, str]) -> None:
+        """Create optional helper scripts/files selected in the GUI."""
+        try:
+            # macOS .app bundle builder script (write under scripts/)
+            if features.get('mac_app_bundle', False):
+                scripts_dir = project_path / "scripts"
+                scripts_dir.mkdir(exist_ok=True)
+                app_bundle_py = '''#!/usr/bin/env python3
+import os
+import shutil
+import stat
+import plistlib
+from pathlib import Path
+import sys
+
+
+def create_app_bundle():
+    app_name = "__APP_NAME__"
+    bundle_name = app_name + ".app"
+
+    if os.path.exists(bundle_name):
+        shutil.rmtree(bundle_name)
+
+    bundle_path = Path(bundle_name)
+    contents_path = bundle_path / "Contents"
+    macos_path = contents_path / "MacOS"
+    resources_path = contents_path / "Resources"
+
+    macos_path.mkdir(parents=True, exist_ok=True)
+    resources_path.mkdir(parents=True, exist_ok=True)
+
+    root = Path.cwd()
+    src_dir = root / "src"
+    if src_dir.exists():
+        shutil.copytree(src_dir, resources_path / "src")
+    else:
+        print("⚠️  src directory not found; the app may not launch.")
+
+    for file in ["requirements.txt", "README.md"]:
+        if (root / file).exists():
+            shutil.copy2(root / file, resources_path)
+
+    icons_src = root / "icons"
+    if icons_src.exists():
+        shutil.copytree(icons_src, resources_path / "icons")
+
+    # Create launcher (Python) inside Contents/MacOS
+    launcher_code = """#!/usr/bin/env python3
+import sys
+import os
+
+app_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+resources_path = os.path.join(app_path, "Resources")
+src_path = os.path.join(resources_path, "src")
+
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
+
+os.chdir(resources_path)
+
+PACKAGE = "__PACKAGE_NAME__"
+
+def _run():
+    try:
+        try:
+            mod = __import__(PACKAGE + ".__main__", fromlist=["main"])  # type: ignore
+            if hasattr(mod, "main"):
+                return mod.main()
+        except Exception:
+            pass
+        try:
+            mod = __import__(PACKAGE + ".cli", fromlist=["main"])  # type: ignore
+            if hasattr(mod, "main"):
+                return mod.main()
+        except Exception:
+            pass
+        pkg = __import__(PACKAGE)
+        print("Launched " + PACKAGE + ": " + getattr(pkg, "__version__", ""))
+    except Exception as e:
+        try:
+            import tkinter as tk
+            from tkinter import messagebox
+            root = tk.Tk()
+            root.withdraw()
+            messagebox.showerror("Error", "Failed to start application: " + str(e))
+            root.destroy()
+        except Exception:
+            try:
+                with open(os.path.join(resources_path, "launch_error.log"), "a") as f:
+                    f.write(str(e) + "\n")
+            except Exception:
+                pass
+
+if __name__ == "__main__":
+    _run()
+"""
+    launcher_path = macos_path / app_name.replace(" ", "")
+    with open(launcher_path, 'w', encoding='utf-8') as f:
+        f.write(launcher_code)
+    st = os.stat(launcher_path)
+    os.chmod(launcher_path, st.st_mode | stat.S_IEXEC)
+
+    plist_data = {
+        'CFBundleName': app_name,
+        'CFBundleDisplayName': app_name,
+        'CFBundleIdentifier': 'com.__PACKAGE_NAME__.app',
+        'CFBundleVersion': '__VERSION__',
+        'CFBundleShortVersionString': '__VERSION__',
+        'CFBundleExecutable': app_name.replace(" ", ""),
+        'CFBundleIconFile': 'app_icon.icns',
+        'CFBundlePackageType': 'APPL',
+        'CFBundleSignature': '????',
+        'LSMinimumSystemVersion': '10.13.0',
+        'NSHighResolutionCapable': True,
+        'NSSupportsAutomaticGraphicsSwitching': True,
+        'NSRequiresAquaSystemAppearance': False,
+        'LSApplicationCategoryType': 'public.app-category.productivity',
+    }
+
+    with open(contents_path / "Info.plist", 'wb') as f:
+        plistlib.dump(plist_data, f)
+
+    print("✅ Created " + bundle_name)
+    print("📁 Bundle location: " + os.path.abspath(bundle_name))
+    print("🚀 Double-click " + bundle_name + " to launch the application")
+
+    return bundle_name
+
+
+if __name__ == "__main__":
+    print("🏗️  Creating macOS Application Bundle...")
+    try:
+        name = create_app_bundle()
+        print("\n🎉 Application bundle creation complete!")
+        print("🚀 Launch: Double-click " + name)
+        print("📱 Install: Drag the .app to Applications folder")
+    except Exception as e:
+        print("❌ Failed: " + str(e))
+'''
+                version = metadata.get('version', '0.1.0')
+                app_bundle_py = app_bundle_py.replace("__APP_NAME__", project_name).replace("__PACKAGE_NAME__", package_name).replace("__VERSION__", version)
+                (scripts_dir / "create_app_bundle.py").write_text(app_bundle_py, encoding='utf-8')
+
+            # Icon generator script
+            if features.get('icon_generator', False):
+                title = (project_name.split()[0] if project_name else "App")
+                icon_py = '''#!/usr/bin/env python3
+from PIL import Image, ImageDraw, ImageFont
+import os
+
+
+def create_icon():
+    size = 1024
+    img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    margin = 80
+    bg_rect = [margin, margin, size - margin, size - margin]
+    corner_radius = 120
+    draw.rounded_rectangle(bg_rect, corner_radius, fill=(45, 55, 72, 255))
+
+    border_margin = margin - 10
+    border_rect = [border_margin, border_margin, size - border_margin, size - border_margin]
+    draw.rounded_rectangle(border_rect, corner_radius + 10, outline=(200, 200, 200, 100), width=8)
+
+    col_width = 160
+    col_height = 400
+    col_spacing = 80
+    start_x = (size - (3 * col_width + 2 * col_spacing)) // 2
+    start_y = (size - col_height) // 2 + 50
+    col_colors = [(99, 102, 241, 255), (245, 158, 11, 255), (34, 197, 94, 255)]
+
+    for i in range(3):
+        x = start_x + i * (col_width + col_spacing)
+        y = start_y
+        col_rect = [x, y, x + col_width, y + col_height]
+        draw.rounded_rectangle(col_rect, 20, fill=(255, 255, 255, 240))
+        header_rect = [x + 10, y + 10, x + col_width - 10, y + 50]
+        draw.rounded_rectangle(header_rect, 10, fill=col_colors[i])
+        card_height = 60
+        card_margin = 15
+        num_cards = [3, 2, 4][i]
+        for j in range(num_cards):
+            card_y = y + 70 + j * (card_height + card_margin)
+            if card_y + card_height > y + col_height - 10:
+                break
+            card_rect = [x + 15, card_y, x + col_width - 15, card_y + card_height]
+            shadow_rect = [x + 17, card_y + 2, x + col_width - 13, card_y + card_height + 2]
+            draw.rounded_rectangle(shadow_rect, 8, fill=(0, 0, 0, 30))
+            draw.rounded_rectangle(card_rect, 8, fill=(255, 255, 255, 255))
+            line_y1 = card_y + 15
+            line_y2 = card_y + 35
+            draw.rectangle([x + 25, line_y1, x + col_width - 25, line_y1 + 3], fill=(120, 120, 120, 180))
+            draw.rectangle([x + 25, line_y2, x + col_width - 45, line_y2 + 3], fill=(160, 160, 160, 120))
+
+    try:
+        font_size = 80
+        font = ImageFont.truetype('/System/Library/Fonts/Helvetica.ttc', font_size)
+    except Exception:
+        font = ImageFont.load_default()
+
+    title = '__TITLE__'
+    title_bbox = draw.textbbox((0, 0), title, font=font)
+    title_width = title_bbox[2] - title_bbox[0]
+    title_x = (size - title_width) // 2
+    title_y = 180
+    draw.text((title_x + 3, title_y + 3), title, font=font, fill=(0, 0, 0, 100))
+    draw.text((title_x, title_y), title, font=font, fill=(255, 255, 255, 255))
+
+    return img
+
+
+def create_icon_set():
+    base_icon = create_icon()
+    sizes = [16, 32, 64, 128, 256, 512, 1024]
+    if not os.path.exists('icons'):
+        os.makedirs('icons')
+    for size in sizes:
+        resized = base_icon.resize((size, size))
+        filename = 'icons/app_icon_' + str(size) + 'x' + str(size) + '.png'
+        resized.save(filename, 'PNG')
+        print('Created ' + filename)
+    base_icon.save('icons/app_icon.png', 'PNG')
+    print('Created icons/app_icon.png')
+
+
+if __name__ == '__main__':
+    create_icon_set()
+'''
+                icon_py = icon_py.replace("__TITLE__", title)
+                scripts_dir = project_path / "scripts"
+                scripts_dir.mkdir(exist_ok=True)
+                (scripts_dir / "create_icon.py").write_text(icon_py, encoding='utf-8')
+
+            # Delete git tracking helper
+            if features.get('remove_git_tracking', False):
+                scripts_dir = project_path / "scripts"
+                scripts_dir.mkdir(exist_ok=True)
+                (scripts_dir / "delete_git_tracking.txt").write_text("rm -rf .git\n", encoding='utf-8')
+
+            # Freeze requirements script
+            if features.get('freeze_requirements', False):
+                freeze_py = '''#!/usr/bin/env python3
+import subprocess
+import sys
+from pathlib import Path
+
+
+def main():
+    result = subprocess.run([sys.executable, '-m', 'pip', 'freeze'], capture_output=True, text=True, check=True)
+    Path('requirements.txt').write_text(result.stdout, encoding='utf-8')
+    print('✅ Wrote requirements.txt')
+
+
+if __name__ == '__main__':
+    main()
+'''
+                scripts_dir = project_path / "scripts"
+                scripts_dir.mkdir(exist_ok=True)
+                (scripts_dir / "freeze_requirements.py").write_text(freeze_py, encoding='utf-8')
+
+            # Build with setup.py helper
+            if features.get('setup_build_script', False):
+                build_py = '''#!/usr/bin/env python3
+import subprocess
+import sys
+
+
+def main():
+    cmd = [sys.executable, 'setup.py', 'sdist', 'bdist_wheel']
+    print('🔧 Running: ' + ' '.join(cmd))
+    subprocess.run(cmd, check=True)
+    print('✅ Build complete. See dist/ directory.')
+
+
+if __name__ == '__main__':
+    main()
+'''
+                (scripts_dir / "build_with_setup.py").write_text(build_py, encoding='utf-8')
+
+        except Exception as e:
+            self.logger.warning(f"Could not create optional scripts: {e}")
+
     def _apply_common_docs(self, project_path: Path, project_name: str, features: Dict[str, bool], metadata: Dict[str, str]) -> None:
         """Create selected common Markdown files across all templates."""
         md_feature_to_type = {
@@ -901,6 +1187,9 @@ class ProjectGenerator:
         
         if not features.get('github_actions', True):
             self._remove_dirs(project_path, ['.github'])
+
+        # No removals needed for optional helper scripts since they are only created when selected
+        # (mac_app_bundle, icon_generator, remove_git_tracking, freeze_requirements, build_package_script)
     
     def _remove_files(self, project_path: Path, patterns: List[str]):
         """Remove files matching patterns."""
@@ -928,41 +1217,47 @@ class ProjectGenerator:
             project_path.mkdir(parents=True, exist_ok=True)
             
             # Generate based on template type
+            success = False
             if template_id == "flask-web-app":
-                return self._generate_flask_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_flask_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "fastapi-web-api":
-                return self._generate_fastapi_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_fastapi_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "django-web-app":
-                return self._generate_django_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_django_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "data-science-project":
-                return self._generate_data_science_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_data_science_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "machine-learning-project":
-                return self._generate_ml_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_ml_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "cli-tool":
-                return self._generate_cli_tool_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_cli_tool_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "python-library":
-                return self._generate_library_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_library_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "game-development":
-                return self._generate_game_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_game_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "desktop-gui-app":
-                return self._generate_desktop_gui_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_desktop_gui_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "microservice":
-                return self._generate_microservice_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_microservice_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "api-client-library":
-                return self._generate_api_client_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_api_client_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "automation-scripts":
-                return self._generate_automation_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_automation_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "jupyter-research":
-                return self._generate_jupyter_research_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_jupyter_research_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "binary-extension":
-                return self._generate_binary_extension_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_binary_extension_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "namespace-package":
-                return self._generate_namespace_package_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_namespace_package_template(project_path, project_name, package_name, features, metadata)
             elif template_id == "plugin-framework":
-                return self._generate_plugin_framework_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_plugin_framework_template(project_path, project_name, package_name, features, metadata)
             else:
                 # Default minimal template
-                return self._generate_minimal_template(project_path, project_name, package_name, features, metadata)
+                success = self._generate_minimal_template(project_path, project_name, package_name, features, metadata)
+
+            # Always apply optional scripts after generation if successful
+            if success:
+                self._apply_optional_scripts(project_path, project_name, package_name, features, metadata)
+            return success
             
         except Exception as e:
             self.logger.error(f"Failed to generate builtin project: {e}")

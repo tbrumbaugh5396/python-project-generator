@@ -10,8 +10,10 @@ import subprocess
 import shutil
 from pathlib import Path
 
+
 def run_command(command, description=""):
     """Run a command and handle errors."""
+
     if description:
         print(f"🔄 {description}...")
     
@@ -26,8 +28,10 @@ def run_command(command, description=""):
             print(f"Error output: {e.stderr}")
         return False
 
+
 def clean_build():
     """Clean build artifacts."""
+
     print("🧹 Cleaning build artifacts...")
     
     patterns = [
@@ -51,12 +55,16 @@ def clean_build():
                     path.unlink()
                     print(f"  Removed file: {path}")
 
+
 def run_tests():
     """Run the test suite."""
+
     return run_command("python3 -m pytest tests/ -v", "Running tests")
+
 
 def run_linting():
     """Run code linting."""
+
     success = True
     
     # Run flake8
@@ -69,24 +77,34 @@ def run_linting():
     
     return success
 
+
 def format_code():
     """Format code with black."""
+
     return run_command("python3 -m black .", "Formatting code with black")
+
 
 def build_package():
     """Build the package."""
+
     return run_command("python3 -m build", "Building package")
+
 
 def install_dev_dependencies():
     """Install development dependencies."""
+
     return run_command("pip install -r requirements-dev.txt", "Installing dev dependencies")
+
 
 def install_package():
     """Install package in development mode."""
+
     return run_command("pip install -e .", "Installing package in development mode")
+
 
 def main():
     """Main build script."""
+
     import argparse
     
     parser = argparse.ArgumentParser(description="Build script for Python Project Generator")
@@ -134,6 +152,7 @@ def main():
     else:
         print("❌ Build failed!")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main()) 
